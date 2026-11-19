@@ -167,7 +167,7 @@ class AlmanacSky extends HTMLElement {
     const stars = Array.from({ length: 70 }, () => `<i style="left:${(rnd() * 100).toFixed(1)}%;top:${(rnd() * 70).toFixed(1)}%;opacity:${(0.25 + rnd() * 0.7).toFixed(2)}${rnd() > 0.8 ? ';width:3px;height:3px' : ''}"></i>`).join('');
     const ns = this.lat >= 0 ? 'N' : 'S', ew = this.lon >= 0 ? 'E' : 'W';
     this.shadowRoot.innerHTML = `<style>${CSS}</style><div class="shell" data-sky="night"><div class="stars">${stars}</div><main>
-<div class="top"><div class="brand"><img class="brand-logo" src="${LOGO}" alt="Almanac sun and moon logo" width="64" height="64"><span class="brand-location">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div><a id="home" href="${this.config.home_path || '/lovelace/0'}">← Home</a></div>
+<div class="top"><div class="brand"><img class="brand-logo" src="${LOGO}" alt="Almanac sun and moon logo" width="64" height="64"><span class="brand-location">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div><a id="home">← Home</a></div>
 <h1 id="head"></h1><p class="sub" id="sub"></p>
 <div class="bar"><div class="key"><span>Sun</span><span class="m">Moon</span></div><div class="live" id="live"></div></div>
 <div class="chart" id="chart" tabindex="0" role="slider" aria-label="Time of day. Drag or use arrow keys to preview the sky; Escape returns to now."><div id="plot"></div></div>
@@ -175,6 +175,7 @@ class AlmanacSky extends HTMLElement {
 <div class="grid"><section class="p" id="sun"></section><section class="p" id="moon"></section><section class="p" id="map"></section><section class="p" id="cycle"></section></div>
 </main></div>`;
     const $ = id => this.shadowRoot.getElementById(id);
+    $('home').setAttribute('href', this.config.home_path || '/lovelace/0');
     $('home').addEventListener('click', e => { e.preventDefault(); history.pushState(null, '', e.currentTarget.getAttribute('href')); window.dispatchEvent(new CustomEvent('location-changed')); });
     const chart = $('chart');
     const seek = e => { const r = chart.getBoundingClientRect(), k = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); const start = this.dayStart(Date.now()), end = this.nextStart(start); this.scrub = Math.min(end, start + Math.round(k * (end - start) / 3e5) * 3e5); this.draw(); };
