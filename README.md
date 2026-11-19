@@ -17,6 +17,7 @@ Almanac computes the sky from your Home Assistant latitude, longitude, and time 
 - Sun elevation, first and last light, solar noon, golden hour, and daylight change.
 - Moon phase, tilt, altitude, direction, rise and set, age, and distance.
 - A sky map and four-week moon phase calendar.
+- Almanac logo in the header, bundled into the card for offline use.
 - Colors that follow night, twilight, golden hour, and daylight.
 - A responsive full-page layout with scrolling on phones.
 
