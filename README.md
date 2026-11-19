@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/almanac.webp" alt="Almanac sun and moon logo" width="256" height="256">
 </p>
 
-A self-contained sun and moon dashboard card for Home Assistant. Originally published as **Fable Sun Moon**.
+A self-contained sun and moon dashboard card for Home Assistant.
 
 [![Open in HACS or Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=yanke7&repository=Home-Assistant-Almanac&category=plugin)
 
@@ -107,9 +107,9 @@ The location and time zone come from Home Assistant's general settings. Dates an
 3. Add `/local/almanac-sky-card.js` as a JavaScript module resource.
 4. Reload the browser and add the card as shown above.
 
-### Migrating from Fable Sun Moon
+### Switching from manual installation
 
-The card type is unchanged: `custom:almanac-sky-card`. Install this repository, remove the old `/local/` resource entry to avoid loading two copies, and reload. Keep your existing `home_path` if it points to your own dashboard.
+Keep the card type as: `custom:almanac-sky-card`. Install this repository, remove the old `/local/` resource entry to avoid loading two copies, and reload. Keep your existing `home_path` if it points to your own dashboard.
 
 ## Development
 
@@ -125,5 +125,3 @@ The regression checks cover short, long, and ordinary local days, a half-hour ti
 ## License
 
 GNU General Public License v3.0 only. See [LICENSE](LICENSE).
-
-Original project: [Fable Sun Moon](https://github.com/yanke7/Home-Assistant/tree/main/Other%20Home%20Assistant%20Projects/Fable%20Sun%20Moon).
