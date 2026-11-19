@@ -1,6 +1,5 @@
 {
-  "name": "Home Assistant Almanac",
-  "filename": "almanac-sky-card.js",
-  "content_in_root": true,
+  "name": "Almanac",
+  "homeassistant": "2026.11.0",
   "render_readme": true
 }
