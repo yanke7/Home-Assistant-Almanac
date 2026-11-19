@@ -127,7 +127,7 @@ class AlmanacSky extends HTMLElement {
   set hass(h) {
     const key = [h.config.latitude, h.config.longitude, h.config.time_zone, h.locale?.language, h.locale?.time_format].join();
     this._hass = h;
-    if (key !== this.key) { this.key = key; this.cache.clear(); this.midnights.clear(); this.scrub = null; this.cycleKey = null; this.init(); }
+    if (key !== this.key) { this.key = key; this.backend = null; this.lastFetch = 0; this.cache.clear(); this.midnights.clear(); this.scrub = null; this.cycleKey = null; this.init(); }
     this.syncBackend();
   }
   connectedCallback() { this.timer = setInterval(() => { this.syncBackend(); if (this.scrub == null) this.draw(); }, 30000); if (this.key) this.init(); this.syncBackend(); }
@@ -138,6 +138,9 @@ class AlmanacSky extends HTMLElement {
     this.fetching = true; this.lastFetch = Date.now();
     try {
       const snapshot = await this._hass.callWS({ type: 'almanac/snapshot' });
+      const config = this._hass.config;
+      const sameLocation = ['latitude', 'longitude', 'time_zone'].every(k => snapshot.location[k] === config[k]);
+      if (!sameLocation) { this.backend = null; return; }
       if (this.isConnected) {
         this.backend = snapshot;
         for (const day of snapshot.days) this.cache.set(day.d0, day);
@@ -216,7 +219,13 @@ class AlmanacSky extends HTMLElement {
     const h = cross(sa, -0.833), c = cross(sa, -6), g = cross(sa, 6);
     let ni = 0; sa.forEach((v, i) => { if (v > sa[ni]) ni = i; });
     d = { d0, end, t, sa, ma, sz, mz, rise: first(h, true), set: last(h, false), dawn: first(c, true), dusk: last(c, false), golden: last(g, false), noon: t[ni], noonAlt: sa[ni], moonEv: cross(ma, -0.833) };
-    d.len = d.rise && d.set ? d.set - d.rise : null;
+    let length = 0, since = sa[0] >= -0.833 ? d0 : null;
+    for (const event of h) {
+      if (event.up) since = event.t;
+      else if (since != null) { length += event.t - since; since = null; }
+    }
+    if (since != null) length += end - since;
+    d.len = length;
     if (this.cache.size > 6) this.cache.delete(this.cache.keys().next().value);
     this.cache.set(d0, d); return d;
   }

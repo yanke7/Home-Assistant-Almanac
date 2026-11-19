@@ -36,6 +36,13 @@ class AstronomyTests(unittest.TestCase):
         d=self.snap('2026-03-08T12:00:00+00:00',28.6,77.2,'Asia/Kolkata')['days'][1]
         self.assertEqual(datetime.fromtimestamp(d['d0']/1000,timezone.utc).isoformat(),'2026-03-07T18:30:00+00:00')
 
+    def test_browser_day_length_parity(self):
+        for at,lat,lon,tz in [('2026-06-21T12:00:00+00:00',80,0,'UTC'),('2026-12-21T12:00:00+00:00',80,0,'UTC'),('2026-06-21T12:00:00+00:00',40,170,'UTC')]:
+            data=self.snap(at,lat,lon,tz)
+            js=json.loads(subprocess.check_output(['node',str(ROOT/'tests/parity.cjs'),at,str(lat),str(lon),tz],text=True))
+            self.assertIsNotNone(js['day']['len'])
+            self.assertAlmostEqual(data['days'][1]['len'],js['day']['len'],delta=1)
+
     def test_polar_day_and_night(self):
         for at,length in [('2026-06-21T12:00:00+00:00',86400000),('2026-12-21T12:00:00+00:00',0)]:
             data=self.snap(at,80,0,'UTC');d=data['days'][1]
