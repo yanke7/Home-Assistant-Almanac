@@ -127,7 +127,7 @@ class AlmanacSky extends HTMLElement {
   set hass(h) {
     const key = [h.config.latitude, h.config.longitude, h.config.time_zone, h.locale?.language, h.locale?.time_format].join();
     this._hass = h;
-    if (key !== this.key) { this.key = key; this.backend = null; this.lastFetch = 0; this.cache.clear(); this.midnights.clear(); this.scrub = null; this.cycleKey = null; this.init(); }
+    if (key !== this.key) { this.key = key; this.backend = null; this.chartKey = null; this.lastFetch = 0; this.cache.clear(); this.midnights.clear(); this.scrub = null; this.cycleKey = null; this.init(); }
     this.syncBackend();
   }
   connectedCallback() { this.timer = setInterval(() => { this.syncBackend(); if (this.scrub == null) this.draw(); }, 30000); if (this.key) this.init(); this.syncBackend(); }
@@ -137,13 +137,15 @@ class AlmanacSky extends HTMLElement {
     if (!this.isConnected || !this._hass?.callWS || this.fetching || Date.now() - (this.lastFetch || 0) < 25000) return;
     this.fetching = true; this.lastFetch = Date.now();
     try {
-      const snapshot = await this._hass.callWS({ type: 'almanac/snapshot' });
+      const snapshot = await this._hass.callWS({ type: 'almanac/snapshot', ...(this.chartKey ? { chart_key: this.chartKey } : {}) });
       const config = this._hass.config;
       const sameLocation = ['latitude', 'longitude', 'time_zone'].every(k => snapshot.location[k] === config[k]);
       if (!sameLocation) { this.backend = null; return; }
       if (this.isConnected) {
         this.backend = snapshot;
-        for (const day of snapshot.days) this.cache.set(day.d0, day);
+        this.chartKey = snapshot.chart_key;
+        for (const day of snapshot.days || []) this.cache.set(day.d0, day);
+        while (this.cache.size > 7) this.cache.delete(this.cache.keys().next().value);
         if (this.scrub == null) this.draw();
       }
     } catch (_) {
@@ -247,9 +249,10 @@ class AlmanacSky extends HTMLElement {
 
     // headline
     let a;
-    if (sunUp && D.set) a = `The sun is up for another <em>${this.dur(D.set - T)}</em>.`;
+    if (sunUp && D.set && D.set > T) a = `The sun is up for another <em>${this.dur(D.set - T)}</em>.`;
     else if (D.rise && T < D.rise) a = `Sunrise in <em>${this.dur(D.rise - T)}</em>.`;
-    else if (D.set) a = `The sun set <em>${this.dur(T - D.set)}</em> ago.`;
+    else if (!sunUp && D.set && D.set <= T) a = `The sun set <em>${this.dur(T - D.set)}</em> ago.`;
+    else if (D.rise || D.set) a = sunUp ? 'The sun is above the horizon.' : 'The sun is below the horizon.';
     else a = sunUp ? 'The sun stays up all day.' : 'The sun stays down all day.';
     const tag = mRise ? this.dayTag(mRise, d0) : '';
     const b = moonUp ? `The ${full} is in the <em class="m">${P8[Math.round(m.az / 45) % 8]} sky</em>.`
@@ -257,7 +260,7 @@ class AlmanacSky extends HTMLElement {
     $('head').innerHTML = `${a} ${b}`;
     $('sub').textContent = `${this.fD.format(T)} · ${this.tm(T)}`;
     $('live').className = 'live' + (this.scrub == null ? '' : ' off');
-    $('live').innerHTML = this.scrub == null ? (live || !this._hass?.callWS ? 'Live' : 'Local calculations') : `Preview ${this.tm(T)} <button type="button">Back to now</button>`;
+    $('live').innerHTML = this.scrub == null ? (live ? 'Live' : 'Local calculations') : `Preview ${this.tm(T)} <button type="button">Back to now</button>`;
     $('chart').setAttribute('aria-valuetext', this.tm(T));
 
     this.plot(D, T, s, m);

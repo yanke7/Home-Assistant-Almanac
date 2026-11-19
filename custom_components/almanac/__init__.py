@@ -14,7 +14,7 @@ CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
 
-@websocket_api.websocket_command({vol.Required("type"): "almanac/snapshot"})
+@websocket_api.websocket_command({vol.Required("type"): "almanac/snapshot", vol.Optional("chart_key"): str})
 @websocket_api.async_response
 async def websocket_snapshot(hass, connection, msg):
     """Return the same read-only snapshot used by the entities."""
@@ -22,7 +22,13 @@ async def websocket_snapshot(hass, connection, msg):
     if not entries or not entries[0].runtime_data.last_update_success:
         connection.send_error(msg["id"], "not_loaded", "Set up Almanac in Devices & services")
         return
-    connection.send_result(msg["id"], entries[0].runtime_data.data)
+    data = entries[0].runtime_data.data
+    location = data["location"]
+    chart_key = f'{location["latitude"]},{location["longitude"]},{location["time_zone"]},{data["days"][1]["d0"]}'
+    result = {**data, "chart_key": chart_key}
+    if msg.get("chart_key") == chart_key:
+        result.pop("days")
+    connection.send_result(msg["id"], result)
 
 
 async def async_setup(hass, config):
@@ -31,7 +37,6 @@ async def async_setup(hass, config):
         StaticPathConfig("/almanac/almanac-sky-card.js",
                          str(Path(__file__).parent / "www" / "almanac-sky-card.js"), False)
     ])
-    frontend.add_extra_js_url(hass, CARD_URL)
     websocket_api.async_register_command(hass, websocket_snapshot)
     return True
 
@@ -41,7 +46,9 @@ async def async_setup_entry(hass, entry):
     coordinator = AlmanacCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
+    entry.async_on_unload(coordinator.async_add_listener(lambda: None))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    frontend.add_extra_js_url(hass, CARD_URL)
     return True
 
 
@@ -49,5 +56,6 @@ async def async_unload_entry(hass, entry):
     """Unload entities and stop background updates."""
     if not await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         return False
+    frontend.remove_extra_js_url(hass, CARD_URL)
     await entry.runtime_data.async_shutdown()
     return True

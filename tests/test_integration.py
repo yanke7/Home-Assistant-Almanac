@@ -14,6 +14,8 @@ class IntegrationTests(unittest.IsolatedAsyncioTestCase):
         self.temp=tempfile.TemporaryDirectory()
         self.hass=HomeAssistant(self.temp.name)
         self.hass.config_entries=ConfigEntries(self.hass,{})
+        from homeassistant.components.frontend import DATA_EXTRA_MODULE_URL
+        self.hass.data[DATA_EXTRA_MODULE_URL] = set()
         self.hass.config.latitude=52.13
         self.hass.config.longitude=-106.67
         self.hass.config.time_zone='America/Regina'
@@ -31,10 +33,15 @@ class IntegrationTests(unittest.IsolatedAsyncioTestCase):
         self.hass.config_entries.async_forward_entry_setups=AsyncMock()
         self.hass.config_entries.async_unload_platforms=AsyncMock(return_value=True)
         self.assertTrue(await integration.async_setup_entry(self.hass,entry))
+        from custom_components.almanac.const import CARD_URL
+        from homeassistant.components.frontend import DATA_EXTRA_MODULE_URL
+        self.assertIn(CARD_URL, self.hass.data[DATA_EXTRA_MODULE_URL])
+        self.assertTrue(entry.runtime_data._listeners)
         self.assertGreater(entry.runtime_data.data['values']['moon_distance'],300000)
         self.hass.config_entries.async_forward_entry_setups.assert_awaited_once()
         self.assertTrue(await integration.async_unload_entry(self.hass,entry))
         self.hass.config_entries.async_unload_platforms.assert_awaited_once()
+        self.assertNotIn(CARD_URL, self.hass.data[DATA_EXTRA_MODULE_URL])
 
     async def test_sensor_contracts(self):
         from custom_components.almanac.coordinator import AlmanacCoordinator
