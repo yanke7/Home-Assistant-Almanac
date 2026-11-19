@@ -128,9 +128,26 @@ class AlmanacSky extends HTMLElement {
     const key = [h.config.latitude, h.config.longitude, h.config.time_zone, h.locale?.language, h.locale?.time_format].join();
     this._hass = h;
     if (key !== this.key) { this.key = key; this.cache.clear(); this.midnights.clear(); this.scrub = null; this.cycleKey = null; this.init(); }
+    this.syncBackend();
   }
-  connectedCallback() { this.timer = setInterval(() => { if (this.scrub == null) this.draw(); }, 30000); if (this.key) this.init(); }
+  connectedCallback() { this.timer = setInterval(() => { this.syncBackend(); if (this.scrub == null) this.draw(); }, 30000); if (this.key) this.init(); this.syncBackend(); }
   disconnectedCallback() { clearInterval(this.timer); this.ro?.disconnect(); }
+
+  async syncBackend() {
+    if (!this.isConnected || !this._hass?.callWS || this.fetching || Date.now() - (this.lastFetch || 0) < 25000) return;
+    this.fetching = true; this.lastFetch = Date.now();
+    try {
+      const snapshot = await this._hass.callWS({ type: 'almanac/snapshot' });
+      if (this.isConnected) {
+        this.backend = snapshot;
+        for (const day of snapshot.days) this.cache.set(day.d0, day);
+        if (this.scrub == null) this.draw();
+      }
+    } catch (_) {
+      this.backend = null;
+      if (this.isConnected && this.scrub == null) this.draw();
+    } finally { this.fetching = false; }
+  }
 
   init() {
     const h = this._hass; if (!h || !this.isConnected) return;
@@ -209,8 +226,9 @@ class AlmanacSky extends HTMLElement {
 
   draw() {
     const root = this.shadowRoot, $ = id => root.getElementById(id); if (!$('plot')) return;
-    const now = Date.now(), T = this.scrub ?? now, d0 = this.dayStart(now), D = this.day(d0);
-    const s = sunAt(T, this.lat, this.lon), m = moonAt(T, this.lat, this.lon), il = illum(T), name = phaseName(il.phase);
+    const clock = Date.now(), live = this.scrub == null && this.backend && Math.abs(clock - this.backend.now) < 120000;
+    const now = live ? this.backend.now : clock, T = this.scrub ?? now, d0 = this.dayStart(now), D = this.day(d0);
+    const s = live ? this.backend.sun : sunAt(T, this.lat, this.lon), m = live ? this.backend.moon : moonAt(T, this.lat, this.lon), il = live ? this.backend.illumination : illum(T), name = phaseName(il.phase);
     root.querySelector('.shell').dataset.sky = s.alt > 6 ? 'day' : s.alt > -4 ? 'golden' : s.alt > -12 ? 'twilight' : 'night';
     const mEv = [...D.moonEv, ...this.day(D.end).moonEv, ...this.day(this.nextStart(D.end)).moonEv].filter(e => e.t > T);
     const mRise = mEv.find(e => e.up)?.t, mSet = mEv.find(e => !e.up)?.t;
@@ -230,7 +248,7 @@ class AlmanacSky extends HTMLElement {
     $('head').innerHTML = `${a} ${b}`;
     $('sub').textContent = `${this.fD.format(T)} · ${this.tm(T)}`;
     $('live').className = 'live' + (this.scrub == null ? '' : ' off');
-    $('live').innerHTML = this.scrub == null ? 'Live' : `Preview ${this.tm(T)} <button type="button">Back to now</button>`;
+    $('live').innerHTML = this.scrub == null ? (live || !this._hass?.callWS ? 'Live' : 'Local calculations') : `Preview ${this.tm(T)} <button type="button">Back to now</button>`;
     $('chart').setAttribute('aria-valuetext', this.tm(T));
 
     this.plot(D, T, s, m);

@@ -1,0 +1,13 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Almanac",
+        "description": "Create sun and moon sensors and load the Almanac dashboard card. Almanac uses the location and time zone in Home Assistant Settings \u2192 System \u2192 General, and updates every minute without an open dashboard. No API key or internet connection is required."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Almanac is already configured."
+    }
+  }
+}

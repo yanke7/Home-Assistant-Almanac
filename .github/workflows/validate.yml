@@ -6,21 +6,32 @@ on:
 permissions:
   contents: read
 jobs:
-  card:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: pip install homeassistant==2026.11.0
+      - run: python -m unittest discover -s tests -p 'test_*.py'
       - run: node --check almanac-sky-card.js
       - run: node verify-day.cjs
-      - run: node -e "const h=require('./hacs.json');require('node:fs').accessSync(h.filename)"
+      - run: node tests/verify-backend.cjs
+      - run: cmp almanac-sky-card.js custom_components/almanac/www/almanac-sky-card.js
+  hassfest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master
   hacs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: hacs/action@main
         with:
-          category: plugin
+          category: integration
           github_token: ${{ secrets.GITHUB_TOKEN }}

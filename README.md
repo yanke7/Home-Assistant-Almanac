@@ -4,9 +4,9 @@
   <img src="https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/almanac.webp" alt="Almanac sun and moon logo" width="256" height="256">
 </p>
 
-A self-contained sun and moon dashboard card for Home Assistant.
+A local sun and moon integration for Home Assistant, with continuously updated sensors and a bundled interactive dashboard card.
 
-[![Open in HACS or Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=yanke7&repository=Home-Assistant-Almanac&category=plugin)
+[![Open in HACS or Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=yanke7&repository=Home-Assistant-Almanac&category=integration)
 
 
 ## Watch the sky change
@@ -23,7 +23,7 @@ The same card adapts to a narrow screen, with a touch-friendly sky chart and ver
 | --- | --- | --- |
 | [![Almanac on a phone in daylight](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-daylight.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-daylight-full.jpg) | [![Almanac on a phone in sunset](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-sunset.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-sunset-full.jpg) | [![Almanac on a phone in night](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-night.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-night-full.jpg) |
 
-Almanac computes the sky from your Home Assistant latitude, longitude, and time zone. It needs no sensor entities, API keys, external libraries, or services.
+Almanac uses your Home Assistant latitude, longitude, and time zone. The backend updates its sensors every minute, even with all browsers closed. The bundled card uses the same backend readings for its live display and matching local calculations for interactive previews. No external astronomy APIs, API keys, or subscriptions are required.
 
 - A plain-language summary of the next sun and moon events.
 - An interactive daily altitude chart: drag or use arrow keys to explore; Escape returns to now.
@@ -64,14 +64,38 @@ Deep navy panels, stars, and a glowing moon.
 
 ## Install with Marketplace or HACS
 
-Use the badge above, or add `https://github.com/yanke7/Home-Assistant-Almanac` as a custom repository with category **Dashboard** (internally `plugin`). Download the card, then reload your browser.
+Requires Home Assistant **2026.11 or newer**.
 
-The repository can be installed by URL before it is accepted into the searchable catalog.
+1. Use the badge above, or add `https://github.com/yanke7/Home-Assistant-Almanac` as a custom repository with category **Integration**.
+2. Download Almanac. Restart Home Assistant if requested so it discovers the new integration.
+3. Go to **Settings → Devices & services → Add integration → Almanac** and confirm setup.
+4. Add **Almanac Sky** to a panel dashboard view using the YAML below. The card loads automatically; no separate card download or dashboard resource is needed.
 
-If the resource was not registered automatically, add it under **Settings → Dashboards → Resources** (enable Advanced Mode in your profile if needed):
+Almanac reads **Settings → System → General** for your home location and time zone. Changes are picked up within a minute. One Almanac entry is supported per Home Assistant instance.
 
-- URL: `/hacsfiles/Home-Assistant-Almanac/almanac-sky-card.js`
-- Type: **JavaScript module**
+The repository can be installed by URL while catalog review is pending. The integration includes its logo for integration and Marketplace branding.
+
+## Sensors for automations
+
+All entities belong to the **Almanac** device. Names below use the default IDs; Home Assistant may add a suffix if an ID already exists.
+
+| Entities | Values |
+| --- | --- |
+| `sensor.almanac_sun_elevation`, `sensor.almanac_sun_azimuth` | Degrees |
+| `sensor.almanac_moon_elevation`, `sensor.almanac_moon_azimuth` | Degrees |
+| `sensor.almanac_moon_phase`, `sensor.almanac_moon_illumination` | Phase name and illumination percentage |
+| `sensor.almanac_moon_age`, `sensor.almanac_moon_distance` | Days and kilometres |
+| `sensor.almanac_daylight_duration`, `sensor.almanac_daylight_change` | Minutes of daylight; change in seconds since yesterday |
+| `sensor.almanac_sky_period` | `day`, `golden`, `twilight`, or `night` |
+| `sensor.almanac_next_sunrise`, `sensor.almanac_next_sunset` | Upcoming timestamps |
+| `sensor.almanac_next_dawn`, `sensor.almanac_next_dusk` | Civil twilight timestamps |
+| `sensor.almanac_next_solar_noon`, `sensor.almanac_next_evening_golden_hour` | Upcoming timestamps; evening golden hour begins at 6° solar elevation |
+| `sensor.almanac_next_moonrise`, `sensor.almanac_next_moonset` | Upcoming timestamps |
+| `binary_sensor.almanac_sun_above_horizon`, `binary_sensor.almanac_moon_above_horizon` | Above the apparent horizon |
+
+Event sensors search the remainder of today and the following two local days. When no event occurs in that window (for example during polar night), the event is `unknown`. Daylight duration still reports zero or the full local-day length during polar night/day. Values are approximate and not intended for navigation. Sensor timestamps are stored in UTC and displayed in your Home Assistant time zone.
+
+If the backend is temporarily unavailable, the card labels its browser-only fallback **Local calculations**. That fallback does not update sensor entities.
 
 ## Configure
 
@@ -102,22 +126,31 @@ The location and time zone come from Home Assistant's general settings. Dates an
 
 ## Manual installation
 
-1. Download `almanac-sky-card.js` from the latest release.
-2. Copy it into `/config/www/`.
-3. Add `/local/almanac-sky-card.js` as a JavaScript module resource.
-4. Reload the browser and add the card as shown above.
+Copy `custom_components/almanac` from the latest release into `/config/custom_components/almanac`, restart Home Assistant, then add **Almanac** under **Settings → Devices & services**. The dashboard JavaScript and logo are included in that folder.
 
-### Switching from manual installation
+## Migrating from the 1.x standalone card
 
-Keep the card type as: `custom:almanac-sky-card`. Install this repository, remove the old `/local/` resource entry to avoid loading two copies, and reload. Keep your existing `home_path` if it points to your own dashboard.
+Version 2 combines the dashboard card and sensors in one integration. The card type remains `custom:almanac-sky-card`; existing views and `home_path` settings can be kept.
+
+1. Save your current resource URL and dashboard YAML so you can return to version 1.0.3 if needed.
+2. Download the 2.x release ZIP and copy `custom_components/almanac` to your Home Assistant configuration directory. Restart and add the integration under Devices & services. Verify the Almanac sensors are available.
+3. Remove the old standalone card download from Marketplace/HACS (or remove its manual dashboard resource). Keep the dashboard view itself. The integration now supplies the card automatically.
+4. If the repository is still registered as **Dashboard**, remove that custom-repository registration and add the same repository as **Integration**, then download the 2.x version for future updates.
+5. Reload your browser. If an old card is still loaded, hard-refresh it. The live card and sensors now use the integration.
+
+For a fresh installation, use the normal Integration instructions above. Do not register both the standalone card resource and the bundled card.
+
+Rollback: disable the Almanac integration, reinstall the **Dashboard** package at `v1.0.3` (or restore its saved JavaScript module resource), restart Home Assistant, and reload the browser. Existing dashboard YAML remains compatible.
 
 ## Development
 
-No build step or npm dependencies are required. Serve this directory with `python3 -m http.server 8000`, then open `http://localhost:8000/preview.html` for a demo with sample location data. Add `?time=2026-11-19T23:15:00Z` to freeze the demo clock for a reproducible sunset preview; this affects only the demo page.
+For backend tests, install `homeassistant==2026.11.0` in a Python 3.14 virtual environment. No JavaScript build step or npm dependencies are required. Keep the root `almanac-sky-card.js` and `custom_components/almanac/www/almanac-sky-card.js` identical when editing the card. Serve this directory with `python3 -m http.server 8000`, then open `http://localhost:8000/preview.html` for a demo with sample location data. Add `?time=2026-11-19T23:15:00Z` to freeze the demo clock for a reproducible sunset preview; this affects only the demo page.
 
 ```sh
 node --check almanac-sky-card.js
 node verify-day.cjs
+node tests/verify-backend.cjs
+python -m unittest discover -s tests -p 'test_*.py'
 ```
 
 The regression checks cover short, long, and ordinary local days, a half-hour time zone, chart bounds, keyboard/pointer selection, and calendar dates. GitHub Actions also validates the repository with the HACS action.
