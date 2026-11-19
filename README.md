@@ -8,7 +8,6 @@ A self-contained sun and moon dashboard card for Home Assistant. Originally publ
 
 [![Open in HACS or Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=yanke7&repository=Home-Assistant-Almanac&category=plugin)
 
-![Almanac sun and moon dashboard](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/Fable-Sun-Moon-Dashboard.png)
 
 Almanac computes the sky from your Home Assistant latitude, longitude, and time zone. It needs no sensor entities, API keys, external libraries, or services.
 
@@ -20,6 +19,34 @@ Almanac computes the sky from your Home Assistant latitude, longitude, and time 
 - Almanac logo in the header, bundled into the card for offline use.
 - Colors that follow night, twilight, golden hour, and daylight.
 - A responsive full-page layout with scrolling on phones.
+
+## From daylight to night
+
+The card changes its colours automatically with the sun’s elevation. These screenshots show the actual card with demo data for Saskatoon on November 19, 2026, including the bundled Almanac logo.
+
+### Daylight · 1:00 PM
+
+Clear blue skies and light panels.
+
+![Almanac in daylight](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/daylight.jpg)
+
+### Sunset · 5:15 PM
+
+Warm orange and rose tones as the sun slips below the horizon.
+
+![Almanac at sunset](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/sunset.jpg)
+
+### Twilight · 6:00 PM
+
+Purple and indigo tones after sunset.
+
+![Almanac at twilight](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/twilight.jpg)
+
+### Night · 9:00 PM
+
+Deep navy panels, stars, and a glowing moon.
+
+![Almanac at night](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/night.jpg)
 
 ## Install with Marketplace or HACS
 
@@ -72,7 +99,7 @@ The card type is unchanged: `custom:almanac-sky-card`. Install this repository, 
 
 ## Development
 
-No build step or npm dependencies are required. Serve this directory with `python3 -m http.server 8000`, then open `http://localhost:8000/preview.html` for a demo with sample location data.
+No build step or npm dependencies are required. Serve this directory with `python3 -m http.server 8000`, then open `http://localhost:8000/preview.html` for a demo with sample location data. Add `?time=2026-11-19T23:15:00Z` to freeze the demo clock for a reproducible sunset preview; this affects only the demo page.
 
 ```sh
 node --check almanac-sky-card.js

@@ -1,11 +1,14 @@
 <!doctype html>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Almanac preview</title>
-<style>body{margin:0;background:#111}</style>
+<style>body{margin:0;background:#111;--header-height:0px}</style>
 <almanac-sky-card id="c"></almanac-sky-card>
 <script src="almanac-sky-card.js"></script>
 <script>
+// Optional fixed instant for reproducible screenshots; the installed card uses real time.
+const instant = new URLSearchParams(location.search).get('time');
+if (instant && Number.isFinite(Date.parse(instant))) Date.now = () => Date.parse(instant);
 const c = document.getElementById('c');
 c.setConfig({});
-c.hass = { config: { latitude: 52.110243, longitude: -106.633837, time_zone: 'America/Regina' }, locale: { language: 'en', time_format: 'language' } };
+c.hass = { config: { latitude: 52.13, longitude: -106.67, time_zone: 'America/Regina' }, locale: { language: 'en', time_format: 'language' } };
 </script>
