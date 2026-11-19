@@ -9,6 +9,12 @@ A self-contained sun and moon dashboard card for Home Assistant. Originally publ
 [![Open in HACS or Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=yanke7&repository=Home-Assistant-Almanac&category=plugin)
 
 
+## Watch the sky change
+
+![Almanac changing from daylight through sunset and twilight to night](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/day-to-night.gif)
+
+A looping preview of the actual card at four times of day. The colours follow the sun automatically. [View still screenshots](#from-daylight-to-night).
+
 ## Almanac on your phone
 
 The same card adapts to a narrow screen, with a touch-friendly sky chart and vertically stacked panels. Captured at a 390 × 844 phone viewport using the demo location and date. Tap a screenshot to see the complete scrolling view, including the moon, sky map, and phase calendar.
