@@ -1,5 +1,9 @@
 # Home Assistant Almanac
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/almanac.webp" alt="Almanac sun and moon logo" width="256" height="256">
+</p>
+
 A self-contained sun and moon dashboard card for Home Assistant. Originally published as **Fable Sun Moon**.
 
 [![Open in HACS or Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=yanke7&repository=Home-Assistant-Almanac&category=plugin)
