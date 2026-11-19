@@ -23,21 +23,30 @@
 ### Task 1: Backend astronomy
 Files: custom_components/almanac/astronomy.py; tests/test_astronomy.py; tests/parity.cjs.
 Interface: snapshot(now, latitude, longitude, time_zone) -> JSON-compatible dict with ms timestamps, sun/moon/illumination, four daily charts, sensor values.
-- [ ] Write and run failing tests for DST, polar day/night, next events, and JavaScript parity.
-- [ ] Implement port with bounded cached daily sampling and accurate day boundaries.
-- [ ] Run Python and existing JavaScript regression tests; commit.
+- [x] Write and run failing tests for DST, polar day/night, next events, and JavaScript parity.
+- [x] Implement port with bounded cached daily sampling and accurate day boundaries.
+- [x] Run Python and existing JavaScript regression tests; commit.
 
 ### Task 2: Integration and card
 Files: __init__.py, const.py, coordinator.py, config_flow.py, sensor.py, binary_sensor.py, strings.json, translations/en.json, manifest.json, www/almanac-sky-card.js; tests/test_integration.py.
 Interfaces: entry.runtime_data coordinator; almanac/snapshot authenticated WS response; frontend read-only polling.
-- [ ] Write lifecycle/config-flow/entity/snapshot tests and observe failures.
-- [ ] Implement backend entities, frontend registration and snapshot consumption, preserving local demo and scrubbing.
-- [ ] Test setup/unload, duplicate flow, values, fallback and parity; commit.
+- [x] Write lifecycle/config-flow/entity/snapshot tests and observe failures.
+- [x] Implement backend entities, frontend registration and snapshot consumption, preserving local demo and scrubbing.
+- [x] Test setup/unload, duplicate flow, values, fallback and parity; commit.
 
 ### Task 3: Package and migrate
 Files: hacs.json, workflows, README.md, migration docs, bundled brand assets.
-- [ ] Update packaging to integration and include GPL license.
-- [ ] Run tests, HACS validation and hassfest, obtain independent review and resolve important findings.
-- [ ] Publish 2.0.0 and update existing catalog submission to integration.
-- [ ] Save current dashboard/resources, install integration, set up config flow, verify sensors and card.
-- [ ] Switch Marketplace category/resource without editing dashboard config; verify and record recovery steps.
+- [x] Update packaging to integration and include GPL license.
+- [x] Run tests, HACS validation and hassfest, obtain independent review and resolve important findings.
+- [x] Publish 2.0.0 and update existing catalog submission to integration.
+- [x] Save current dashboard/resources, install integration, set up config flow, verify sensors and card.
+- [x] Switch Marketplace category/resource without editing dashboard config; verify and record recovery steps.
+
+
+## Completion evidence
+
+Released v2.0.0 through PR #1. Ten Python tests and both JavaScript suites passed. HACS integration validation and hassfest passed on the release source. A full isolated Home Assistant 2026.11 startup loaded all 21 entities and unloaded successfully.
+
+Independent review findings were resolved for location changes, polar daylight, chart payload size/cache bounds, frontend unload, and polling without enabled entities. The live migration preserved the existing dashboard configuration, replaced the standalone Marketplace package with the integration, and verified all 21 entities after restart. Sensor readings changed with the dashboard closed. The bundled card displayed the logo and live data after reopening.
+
+Catalog PR hacs/default#14520 now requests the integration category; all automated checks passed. Maintainer approval remains external.
