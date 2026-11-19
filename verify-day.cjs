@@ -18,7 +18,7 @@ for(const [zone,start,end] of [
   const first=Date.parse(start),last=Date.parse(end),card=new Card(),elements={};
   function element(id){
     return elements[id]??={events:{},addEventListener(k,f){this.events[k]=f;},
-      setPointerCapture(){},getBoundingClientRect(){return {left:0,width:100};}};
+      setAttribute(k,v){this[k]=v;},setPointerCapture(){},getBoundingClientRect(){return {left:0,width:100};}};
   }
   now=first+12*3600000;
   Object.assign(card,{isConnected:true,config:{},shadowRoot:{getElementById:element},draw(){}});

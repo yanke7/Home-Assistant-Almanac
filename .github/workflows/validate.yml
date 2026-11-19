@@ -21,6 +21,7 @@ jobs:
       - run: node --check almanac-sky-card.js
       - run: node verify-day.cjs
       - run: node tests/verify-backend.cjs
+      - run: node tests/verify-home-link.cjs
       - run: cmp almanac-sky-card.js custom_components/almanac/www/almanac-sky-card.js
   hassfest:
     runs-on: ubuntu-latest
