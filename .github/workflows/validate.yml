@@ -1,0 +1,26 @@
+name: Validate
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  card:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check almanac-sky-card.js
+      - run: node verify-day.cjs
+      - run: node -e "const h=require('./hacs.json');require('node:fs').accessSync(h.filename)"
+  hacs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hacs/action@main
+        with:
+          category: plugin
+          github_token: ${{ secrets.GITHUB_TOKEN }}
