@@ -90,6 +90,19 @@ const CSS = `
  --sans:var(--yanke-font,var(--ha-font-family-body,system-ui));--serif:var(--sans);--text-scale:var(--yanke-scale,1);
  overflow:auto;
 }
+/* Chart sky: each theme tints only the sun and moon graph through the day phases */
+.shell[data-theme=steel]{--cs-night:linear-gradient(180deg,#0f1114,#171a1f 62%,#20242a);--cs-twilight:linear-gradient(180deg,#1c1b26,#34303f 62%,#4d4250);--cs-golden:linear-gradient(180deg,#2e2b33,#5a4a4c 62%,#8a6246);--cs-day:linear-gradient(180deg,#2d3744,#46576a 62%,#5f7488)}
+.shell[data-theme=relay]{--cs-night:linear-gradient(180deg,#0d100c,#151a12 62%,#1e2318);--cs-twilight:linear-gradient(180deg,#1f1a17,#3d2f26 62%,#5b3f2b);--cs-golden:linear-gradient(180deg,#2f2518,#6a4a21 62%,#a8672a);--cs-day:linear-gradient(180deg,#333b20,#53612d 62%,#6b7a38)}
+.shell[data-theme=neon]{--cs-night:linear-gradient(180deg,#02040f,#070d24 62%,#10112b);--cs-twilight:linear-gradient(180deg,#0d0a2a,#2a1250 62%,#5a1d6b);--cs-golden:linear-gradient(180deg,#2a0f4a,#7a2380 62%,#d0508a);--cs-day:linear-gradient(180deg,#07274a,#0b5a86 62%,#1189a8)}
+.shell[data-theme=abyss]{--cs-night:linear-gradient(180deg,#04061a,#0c1233 62%,#08102a);--cs-twilight:linear-gradient(180deg,#0d1038,#2a2466 62%,#4a3a85);--cs-golden:linear-gradient(180deg,#1e1b5a,#5b3f93 62%,#b36aa5);--cs-day:linear-gradient(180deg,#14246a,#2a4fa8 62%,#4a7fd0)}
+.shell[data-theme=tide]{--cs-night:linear-gradient(180deg,#041a26,#082c3c 62%,#06202e);--cs-twilight:linear-gradient(180deg,#0a2a4a,#1f4f6e 62%,#4b6f7a);--cs-golden:linear-gradient(180deg,#0f3f52,#3a7a78 62%,#a87546);--cs-day:linear-gradient(180deg,#0a4a62,#127a8c 62%,#198c8c)}
+.shell[data-theme=trek]{--cs-night:linear-gradient(180deg,#050403,#0d0a07 62%,#14100b);--cs-twilight:linear-gradient(180deg,#120d1a,#2a1d3a 62%,#47315a);--cs-golden:linear-gradient(180deg,#231409,#5a3510 62%,#a05a14);--cs-day:linear-gradient(180deg,#3a2a10,#6a4a14 62%,#8a6418)}
+.shell[data-theme=appearance]{--cs-night:linear-gradient(180deg,color-mix(in srgb,#000 55%,var(--bg1)),color-mix(in srgb,#000 55%,var(--bg2)) 62%,color-mix(in srgb,#000 55%,var(--bg3)));--cs-twilight:linear-gradient(180deg,color-mix(in srgb,#6b4468 35%,var(--bg1)),color-mix(in srgb,#6b4468 35%,var(--bg2)) 62%,color-mix(in srgb,#6b4468 35%,var(--bg3)));--cs-golden:linear-gradient(180deg,color-mix(in srgb,#e79158 35%,var(--bg1)),color-mix(in srgb,#e79158 35%,var(--bg2)) 62%,color-mix(in srgb,#e79158 35%,var(--bg3)));--cs-day:linear-gradient(180deg,color-mix(in srgb,#86b9ea 30%,var(--bg1)),color-mix(in srgb,#86b9ea 30%,var(--bg2)) 62%,color-mix(in srgb,#86b9ea 30%,var(--bg3)))}
+.shell[data-sky=night] .chart{background:var(--cs-night)}
+.shell[data-sky=twilight] .chart{background:var(--cs-twilight)}
+.shell[data-sky=golden] .chart{background:var(--cs-golden)}
+.shell[data-sky=day] .chart{background:var(--cs-day)}
+.shell:not([data-theme=original])[data-sky=golden] .chart,.shell:not([data-theme=original])[data-sky=day] .chart{--mute:var(--ink)}
 .header-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .settings-open,.settings-close,.theme-choice{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);cursor:pointer}
 .settings-open{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;padding:10px}
