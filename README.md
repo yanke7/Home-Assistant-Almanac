@@ -147,9 +147,13 @@ If the backend is temporarily unavailable, the card labels its browser-only fall
 
 ## Bright planets
 
-Toggle **Planets** in **Orbital / Look** (called **Where to look** in the other themes) to plot Venus, Mars, Jupiter and Saturn. The dots and altitude, compass direction and azimuth readings update as you drag the timeline. Hollow dots on the rim mark planets below the horizon. The toggle is saved in your browser.
+**Orbital / Look** (called **Where to look** in the other themes) plots Venus, Mars, Jupiter and Saturn by default. Turn off **Show planets on the sky map** in Settings to hide them. The dots and altitude, compass direction and azimuth readings update as you drag the timeline. Hollow dots on the rim mark planets below the horizon. The toggle is saved in your browser.
 
 Positions are calculated offline using [JPL’s approximate planetary elements](https://ssd.jpl.nasa.gov/planets/approx_pos.html) for 1800–2050. The map shows where to look. Daylight, clouds and obstructions affect whether you can see a planet.
+
+### Tonight’s Lineup
+
+Open the **Tonight’s Lineup** tab for local rise, transit (peak altitude), set, apparent magnitude and estimated visibility for all four planets. The window runs from the middle of the current local day to the middle of the next, so events after midnight appear under their own date. A dash means that event does not occur in the window. Magnitude is approximate and uses [published planetary brightness models](https://arxiv.org/abs/1808.01973). Visibility uses the planet's altitude and a solar elevation below −6°, with evening or morning opportunities listed when applicable.
 
 ## Tonight’s dark-sky window
 

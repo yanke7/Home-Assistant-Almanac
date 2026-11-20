@@ -58,18 +58,49 @@ function heliocentric([elements, rates], centuries) {
   ];
 }
 
-function planetsAt(time, lat, lon) {
+// Approximate visual magnitudes. Saturn includes the projected opening of its rings.
+function planetMagnitude(name, heliocentricPosition, geocentricPosition) {
+  const radius = Math.hypot(...heliocentricPosition);
+  const distance = Math.hypot(...geocentricPosition);
+  const cosine = heliocentricPosition.reduce((sum, value, i) => sum + value * geocentricPosition[i], 0) / (radius * distance);
+  const angle = Math.acos(Math.max(-1, Math.min(1, cosine))) / R;
+  const distanceTerm = 5 * Math.log10(radius * distance);
+  switch (name) {
+    case 'Venus':
+      return distanceTerm + (angle <= 163.7
+        ? -4.384 + angle * (-.001044 + angle * (.0003687 + angle * (-.000002814 + angle * .000000008938)))
+        : 236.05828 + angle * (-2.81914 + angle * .00839034));
+    case 'Mars': return distanceTerm - 1.52 + .016 * angle;
+    case 'Jupiter': return distanceTerm - 9.40 + .005 * angle;
+    case 'Saturn': {
+      const [x, y, z] = geocentricPosition;
+      const longitude = Math.atan2(y, x);
+      const latitude = Math.atan2(z, Math.hypot(x, y));
+      const tilt = 28.06 * R;
+      const opening = Math.abs(Math.sin(tilt) * Math.cos(latitude) * Math.sin(longitude - 169.51 * R)
+        - Math.cos(tilt) * Math.sin(latitude));
+      return distanceTerm - 8.88 + .044 * angle - 2.6 * opening + 1.25 * opening ** 2;
+    }
+  }
+}
+
+function planetsAt(time, lat, lon, includeMagnitude = false) {
   const centuries = days(time) / 36525;
   const earth = heliocentric(EARTH_ORBIT, centuries);
   return PLANETS.map(({name, color, orbit}) => {
-    const [x, y, z] = heliocentric(orbit, centuries).map((value, i) => value - earth[i]);
+    const position = heliocentric(orbit, centuries);
+    const geocentric = position.map((value, i) => value - earth[i]);
+    const [x, y, z] = geocentric;
     const equatorialY = y * Math.cos(OBL) - z * Math.sin(OBL);
     const equatorialZ = y * Math.sin(OBL) + z * Math.cos(OBL);
     const coordinates = {
       ra: Math.atan2(equatorialY, x),
       dec: Math.atan2(equatorialZ, Math.hypot(x, equatorialY)),
     };
-    return { name, color, ...place(coordinates, time, lat, lon) };
+    const horizon = place(coordinates, time, lat, lon);
+    return { name, color, ...horizon,
+      magnitude: includeMagnitude ? planetMagnitude(name, position, geocentric) : null };
+
   });
 }
 
@@ -241,9 +272,22 @@ button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--in
 .moonrow .name{font-family:var(--serif);font-size:calc(clamp(22px,2vw,28px) * var(--text-scale));line-height:1.1}
 .moonrow .cap{margin:6px 0 0}
 .map{display:block;width:100%;max-width:300px;margin:0 auto}
-#planet-toggle{display:block;margin:0 auto 6px;min-height:32px;font-size:12px;text-transform:none;letter-spacing:0}
-#planet-toggle[aria-pressed=true]{border-color:var(--moon);box-shadow:inset 0 0 0 1px var(--moon)}
-#map:has(#planet-toggle[aria-pressed=true]) .map{max-width:210px}
+.view-tabs{display:flex;gap:8px;margin:6px 0 8px}
+.view-tabs button[aria-selected=true]{border-color:var(--sun);color:var(--sun)}
+.planet-setting{display:flex;gap:8px;align-items:center;margin:14px 0 0;font-size:14px}
+main [hidden]{display:none!important}
+#map:has(.planet-readings) .map{max-width:210px}
+.lineup-scroll{overflow-x:auto}
+.lineup-table{width:100%;border-collapse:collapse;font-size:clamp(13px,1.4vw,17px);text-align:left}
+.lineup-table th,.lineup-table td{padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.lineup-table thead th{color:var(--mute);font-weight:600}
+.lineup-table tbody th{color:var(--ink)}
+.lineup-status{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:2px 8px;color:var(--ink)}
+.lineup-status[data-visible=true]{border-color:var(--moon)}
+@container(max-width:640px){
+ .lineup-table th,.lineup-table td{padding:8px 5px}
+ .lineup-table{font-size:12px}
+}
 .planet-readings{list-style:none;padding:0;margin:4px 0;font-size:12px}
 .planet-readings li{display:flex;justify-content:space-between;gap:5px}
 .planet-readings strong::before{content:"";display:inline-block;width:7px;height:7px;margin-inline-end:5px;border-radius:50%;background:var(--planet-color);border:1px solid var(--mute)}
@@ -460,11 +504,13 @@ class AlmanacSky extends HTMLElement {
     this.shadowRoot.innerHTML = `<style>${CSS}</style><div id="shell" class="shell" data-sky="night"><div class="stars">${stars}</div><main>
 <header class="console-header"><div class="top"><div class="brand"><img id="brand-logo" class="brand-logo" src="${LOGO}" alt="Almanac sun and moon logo" width="64" height="64"><strong class="trek-title">Almanac</strong><span class="brand-location"><span class="brand-prefix">Almanac · </span>${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div><div class="header-actions"><a id="home">← Home</a><button id="settings" class="settings-open" type="button" aria-label="Almanac settings" aria-haspopup="dialog" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.9 7.9 0 0 0 0-2l2-1.5-2-3.5-2.3 1a8 8 0 0 0-1.7-1L15 3h-4l-.4 3a8 8 0 0 0-1.7 1L6.6 6l-2 3.5 2 1.5a7.9 7.9 0 0 0 0 2l-2 1.5 2 3.5 2.3-1a8 8 0 0 0 1.7 1l.4 3h4l.4-3a8 8 0 0 0 1.7-1l2.3 1 2-3.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg></button></div></div>
 <h1 id="head"></h1><p class="sub" id="sub"></p>
-</header><section class="console-chart" aria-label="Daily sky chart"><div class="bar"><div class="key"><span>Sun</span><span class="m">Moon</span></div><div class="live" id="live"></div></div>
+</header><div class="view-tabs" role="tablist" aria-label="Almanac views"><button id="sky-tab" type="button" role="tab" aria-controls="sky-view" aria-selected="true">Sky</button><button id="lineup-tab" type="button" role="tab" aria-controls="lineup-view" aria-selected="false" tabindex="-1">Tonight’s Lineup</button></div>
+<div id="sky-view" role="tabpanel" aria-labelledby="sky-tab" style="display:contents"><section class="console-chart" aria-label="Daily sky chart"><div class="bar"><div class="key"><span>Sun</span><span class="m">Moon</span></div><div class="live" id="live"></div></div>
 <div class="chart" id="chart" tabindex="0" role="slider" aria-label="Time of day. Drag or use arrow keys to preview the sky; Escape returns to now."><div id="plot"></div></div>
 <div class="twilight-key"><span>Civil twilight</span><span>Nautical twilight</span><span>Astronomical twilight</span><span>Night</span><span>Moonless dark sky</span></div><p class="hint">Drag across the day to see the sky at any hour.</p></section>
-<div class="grid"><section class="p" id="sun"></section><section class="p" id="moon"></section><section class="p" id="map">${panelHeading('Where to look', 'ORBITAL / LOOK', 158)}<button type="button" id="planet-toggle" aria-pressed="false">Planets</button><div id="map-readout"></div></section><section class="p" id="cycle"></section><span class="rail-footer">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div>
-</main><dialog id="settings-dialog" class="theme-dialog" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">Almanac settings</h2><button id="settings-close" class="settings-close" type="button">Done</button></div><p class="settings-note">Choose a theme. Saved for Almanac in this browser. Original follows daylight, sunset and night.</p><div class="theme-grid">${THEMES.map(([id, name, description, background, accent]) => `<button type="button" class="theme-choice" data-theme-choice="${id}" aria-pressed="false"><span class="theme-swatch" aria-hidden="true" style="background:linear-gradient(135deg,${background} 55%,${accent} 56%)"></span><span><strong>${name}</strong><small>${description}</small></span></button>`).join('')}</div></dialog></div>`;
+<div class="grid"><section class="p" id="sun"></section><section class="p" id="moon"></section><section class="p" id="map">${panelHeading('Where to look', 'ORBITAL / LOOK', 158)}<div id="map-readout"></div></section><section class="p" id="cycle"></section><span class="rail-footer">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div>
+</div><section class="p" id="lineup-view" role="tabpanel" aria-labelledby="lineup-tab" hidden></section>
+</main><dialog id="settings-dialog" class="theme-dialog" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">Almanac settings</h2><button id="settings-close" class="settings-close" type="button">Done</button></div><p class="settings-note">Choose a theme. Saved for Almanac in this browser. Original follows daylight, sunset and night.</p><div class="theme-grid">${THEMES.map(([id, name, description, background, accent]) => `<button type="button" class="theme-choice" data-theme-choice="${id}" aria-pressed="false"><span class="theme-swatch" aria-hidden="true" style="background:linear-gradient(135deg,${background} 55%,${accent} 56%)"></span><span><strong>${name}</strong><small>${description}</small></span></button>`).join('')}</div><label class="planet-setting"><input type="checkbox" id="planet-toggle"> Show planets on the sky map</label></dialog></div>`;
     const $ = id => this.shadowRoot.getElementById(id);
     $('home').setAttribute('href', this.config.home_path || '/lovelace/0');
     $('home').addEventListener('click', e => { e.preventDefault(); history.pushState(null, '', e.currentTarget.getAttribute('href')); window.dispatchEvent(new CustomEvent('location-changed')); });
@@ -475,13 +521,35 @@ class AlmanacSky extends HTMLElement {
     dialog.addEventListener('click', e => { const button = e.target.closest('[data-theme-choice]'); if (button) this.chooseTheme(button.dataset.themeChoice); });
     this.applyTheme();
     const planetToggle = $('planet-toggle');
-    try { this.showPlanets = localStorage.getItem('almanac.planets') === 'true'; } catch (_) {}
-    planetToggle.setAttribute('aria-pressed', String(Boolean(this.showPlanets)));
-    planetToggle.addEventListener('click', () => {
-      this.showPlanets = !this.showPlanets;
-      planetToggle.setAttribute('aria-pressed', String(this.showPlanets));
+    this.showPlanets = true;
+    try { this.showPlanets = localStorage.getItem('almanac.planets') !== 'false'; } catch (_) {}
+    planetToggle.checked = this.showPlanets;
+    planetToggle.addEventListener('change', () => {
+      this.showPlanets = planetToggle.checked;
       try { localStorage.setItem('almanac.planets', String(this.showPlanets)); } catch (_) {}
       this.draw();
+    });
+    const tabs = [$('sky-tab'), $('lineup-tab')];
+    this.showLineup = false;
+    const selectTab = index => {
+      this.showLineup = index === 1;
+      $('sky-view').hidden = this.showLineup;
+      $('lineup-view').hidden = !this.showLineup;
+      tabs.forEach((tab, i) => {
+        tab.setAttribute('aria-selected', String(i === index));
+        tab.tabIndex = i === index ? 0 : -1;
+      });
+      this.draw();
+    };
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectTab(index));
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? 1 : 1 - index;
+        selectTab(next);
+        tabs[next].focus();
+      });
     });
     const chart = $('chart');
     const seek = e => { const r = chart.getBoundingClientRect(), k = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); const start = this.dayStart(Date.now()), end = this.nextStart(start); this.scrub = Math.min(end, start + Math.round(k * (end - start) / 3e5) * 3e5); this.draw(); };
@@ -571,6 +639,7 @@ class AlmanacSky extends HTMLElement {
     $('live').innerHTML = this.scrub == null ? (live ? 'Live' : 'Local calculations') : `Preview ${this.tm(T)} <button type="button">Back to now</button>`;
     $('chart').setAttribute('aria-valuetext', this.tm(T));
 
+    if (this.showLineup) this.renderLineup(T, D);
     this.plot(D, T, s, m);
 
     // sun
@@ -618,6 +687,60 @@ ${dot(s, sunUp, 'var(--sun)', 6)}${dot(m, moonUp, 'var(--moon)', 5)}${planetDots
 <p class="cap" style="margin:10px 0 0;text-align:center">Centre is straight overhead; the rim is the horizon. Dashed markers are below it.</p>`;
 
     if (this.cycleKey !== d0) { this.cycleKey = d0; this.cycle(now, d0); }
+  }
+
+  renderLineup(time, today) {
+    const panel = this.shadowRoot.getElementById('lineup-view');
+    const tomorrow = this.day(today.end);
+    // Use the middle of each local day to keep the evening and following morning together.
+    const start = (today.d0 + today.end) / 2;
+    const end = (tomorrow.d0 + tomorrow.end) / 2;
+    const key = [start, end, this.lat, this.lon].join();
+    if (this.lineupCache?.key !== key) {
+      const rows = PLANETS.map(() => ({ rise: null, transit: null, set: null, evening: false, morning: false }));
+      let previous = null;
+      let earlier = null;
+      for (let t = start - STEP; t <= end + STEP; t += STEP) {
+        const positions = planetsAt(t, this.lat, this.lon);
+        const dark = t >= start && t < end && sunAt(t, this.lat, this.lon).alt < -6;
+        positions.forEach(({alt}, i) => {
+          const row = rows[i];
+          if (dark && alt >= 0) row[t < today.end ? 'evening' : 'morning'] = true;
+          if (previous) {
+            const last = previous[i].alt;
+            if ((last < 0) !== (alt < 0)) {
+              const crossing = t - STEP + STEP * last / (last - alt);
+              const event = alt >= 0 ? 'rise' : 'set';
+              if (crossing >= start && crossing < end) row[event] ??= crossing;
+            }
+            if (earlier && last >= earlier[i].alt && last > alt) {
+              const left = earlier[i].alt;
+              const fraction = .5 * (left - alt) / (left - 2 * last + alt);
+              const peak = t - STEP + fraction * STEP;
+              if (peak >= start && peak < end) row.transit ??= peak;
+            }
+          }
+        });
+        earlier = previous;
+        previous = positions;
+      }
+      this.lineupCache = { key, rows };
+    }
+    const sun = sunAt(time, this.lat, this.lon);
+    const stamp = value => value == null ? '—' : `${this.fS.format(value)} ${this.tm(value)}`;
+    const rows = planetsAt(time, this.lat, this.lon, true).map((planet, i) => {
+      const {rise, transit, set, evening, morning} = this.lineupCache.rows[i];
+      const visible = planet.alt >= 0 && sun.alt < -6;
+      let status = planet.alt >= 0 ? 'Daylight / twilight' : 'Below horizon';
+      if (morning) status = 'Morning sky';
+      if (evening) status = morning ? 'Evening & morning' : 'Evening sky';
+      if (visible) status = this.scrub == null ? 'Visible now' : 'Visible at preview';
+      const magnitude = planet.magnitude.toFixed(1);
+      return `<tr><th scope="row">${planet.name}</th><td>${stamp(rise)}</td><td>${stamp(transit)}</td><td>${stamp(set)}</td><td>${magnitude}</td><td><span class="lineup-status" data-visible="${visible}">${status}</span></td></tr>`;
+    });
+    panel.innerHTML = `<h2>Tonight’s Lineup</h2><p class="cap">${stamp(start)} – ${stamp(end)} · Local time</p>
+<div class="lineup-scroll" tabindex="0" aria-label="Planet events and visibility"><table class="lineup-table"><thead><tr><th scope="col">Planet</th><th scope="col">Rise</th><th scope="col">Transit</th><th scope="col">Set</th><th scope="col"><abbr title="Apparent magnitude">Mag.</abbr></th><th scope="col">Visibility</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>
+<p class="cap">Transit is peak altitude. A dash means the event falls outside this window. Visibility is estimated from the horizon and civil twilight.</p>`;
   }
 
   plot(D, T, s, m) {
