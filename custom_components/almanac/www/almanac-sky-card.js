@@ -208,8 +208,10 @@ h1{font-size:calc(clamp(22px,2.3vw,34px) * var(--text-scale));max-width:none;mar
 .shell[data-theme=trek] .console-chart{display:flex;flex-direction:column;flex:1 0 auto}
 .shell[data-theme=trek] .chart{min-height:175px}
 .shell[data-theme=trek] .grid{
- position:relative;gap:clamp(9px,1vw,20px);margin-top:8px;padding-bottom:clamp(14px,1.6vw,32px);
- border:0;background:linear-gradient(90deg,#efbf48 0 6%,#030303 6% 6.3%,#de893e 6.3% 27%,#030303 27% 27.3%,#efc756 27.3% 100%) bottom/100% clamp(10px,1.3vw,26px) no-repeat;
+ --footer-space:clamp(14px,1.6vw,32px);--footer-band:clamp(10px,1.3vw,26px);
+ --joint:calc(clamp(34px,4.65vw,96px) + clamp(9px,1vw,18px));
+ position:relative;gap:clamp(9px,1vw,20px);margin-top:8px;padding-bottom:var(--footer-space);
+ border:0;background:linear-gradient(90deg,transparent 0 var(--joint),#030303 var(--joint) calc(var(--joint) + 3px),#de893e calc(var(--joint) + 3px) 27%,#030303 27% 27.3%,#efc756 27.3% 100%) bottom/100% var(--footer-band) no-repeat;
 }
 @container(min-width:1100px){.shell[data-theme=trek] .grid{grid-template-columns:1.15fr .94fr .98fr 1.02fr}}
 .shell[data-theme=trek] .p{
@@ -225,6 +227,17 @@ h1{font-size:calc(clamp(22px,2.3vw,34px) * var(--text-scale));max-width:none;mar
 .shell[data-theme=trek] #moon{--rail:#959cda;--tail:#aa86ad;--segments:var(--rail) 0 41%,#030303 41% 42.5%,#dbb784 42.5% 46%,#030303 46% 47.5%,#e3aa5d 47.5% 64%,#030303 64% 65.5%,var(--rail) 65.5%}
 .shell[data-theme=trek] #map{--tail:#f1cf83}
 .shell[data-theme=trek] #cycle{--rail:#df8e48;--tail:#969bd3}
+/* Continue the rail of the bottom-left instrument into the shared footer. */
+@container(max-width:1099px){.shell[data-theme=trek] .grid{--joint:calc(clamp(11px,1vw,21px) + clamp(9px,1vw,18px))}}
+@container(min-width:1100px){.shell[data-theme=trek] #sun{--join-space:var(--footer-space);--join-band:var(--footer-band)}}
+@container(641px <= width < 1100px){.shell[data-theme=trek] #map{--join-space:var(--footer-space);--join-band:var(--footer-band)}}
+@container(max-width:640px){.shell[data-theme=trek] #cycle{--join-space:var(--footer-space);--join-band:var(--footer-band)}}
+.shell[data-theme=trek] .grid .p{
+ margin-bottom:calc(-1 * var(--join-space,0px));border-bottom-width:var(--join-band,0px);
+ border-bottom-left-radius:calc(var(--rail-width) + var(--elbow)) calc(var(--join-band,0px) + var(--elbow));
+ mask:linear-gradient(#000 0 0) top/100% calc(100% - var(--join-band,0px)) no-repeat,
+   linear-gradient(#000 0 0) left/var(--joint) 100% no-repeat;
+}
 .shell[data-theme=trek] .p .lab{
  display:flex;align-items:stretch;gap:5px;height:var(--band);margin:calc(-1 * var(--band)) 0 10px;
  padding:0 0 0 5px;width:auto;background:#030303;color:#f3c557;
