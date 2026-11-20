@@ -109,6 +109,16 @@ Use the **Settings** gear beside Home on the Almanac card to choose a theme. The
 
 **Original** is the default and preserves the automatic daylight, sunset, twilight, and night colours. Other options are **Brushed Steel**, **Amber Relay**, **Neon Grid**, **Midnight Drift**, **Aqua Current**, **Star Trek**, and **Follow Appearance**. Follow Appearance uses the shared palette, font, and text size when the Appearance dashboard resource is loaded. Otherwise it uses your active Home Assistant colours and font. The theme only changes appearance; sensors and astronomical calculations stay the same.
 
+## Stardate & astronomical events
+
+The header rotates through the next two major Moon phases, meteor shower peaks, and equinoxes or solstices. Use the arrows to browse or pause it. The stardate is Almanac’s display of the UTC year and its fractional progress.
+
+Meteor peaks are estimated from typical solar longitudes. Each entry shows the ideal hourly rate (ZHR), lunar illumination and a location-based moonlight estimate at the peak. Actual peak times and rates vary. [International Meteor Organization calendar](https://www.imo.net/calendar/)
+
+### Languages
+
+Choose **Language** in the card’s Settings. The browser saves the preference and applies it to the ticker, navigation, data labels and local date formatting. Available languages are English, French, Dutch, German, Spanish, Tagalog, Swedish, Italian, Polish, Danish and Norwegian Bokmål. Some explanatory and accessibility text remains in English.
+
 ## Sensors for automations
 
 Find all **38 sensors and 4 binary sensors** under **Settings → Devices & services → Almanac → Devices → Almanac**. Use them as automation triggers or conditions. They update every minute with the dashboard closed. Dragging the chart previews another time only in that browser. Names below use the default IDs; Home Assistant may add a suffix if an ID already exists.
@@ -317,7 +327,7 @@ type: custom:almanac-sky-card
 | `telemetry` | Automatic weather source | Optional entity overrides for Sensor Telemetry. |
 | `home_path` | `/lovelace/0` | Local dashboard path for the Home link. |
 
-The location and time zone come from Home Assistant's general settings. Dates and times follow your frontend locale; descriptive text is in English. Astronomical values are approximate.
+The location and time zone come from Home Assistant's general settings. Use **Settings → Language** to change the dashboard language and local date formatting. Astronomical values are approximate.
 
 ## Manual installation
 
