@@ -4,13 +4,16 @@ import importlib
 import tempfile
 import unittest
 from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntries, ConfigEntry, ConfigEntryState
 from types import MappingProxyType
 
 class IntegrationTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
+        satellite_feed = patch("custom_components.almanac.iss.ISSPasses.next_pass", new_callable=AsyncMock, return_value=None)
+        satellite_feed.start()
+        self.addCleanup(satellite_feed.stop)
         self.temp=tempfile.TemporaryDirectory()
         self.hass=HomeAssistant(self.temp.name)
         self.hass.config_entries=ConfigEntries(self.hass,{})

@@ -111,7 +111,7 @@ Use the **Settings** gear beside Home on the Almanac card to choose a theme. The
 
 ## Sensors for automations
 
-Find all **37 sensors and 4 binary sensors** under **Settings → Devices & services → Almanac → Devices → Almanac**. Use them as automation triggers or conditions. They update every minute with the dashboard closed. Dragging the chart previews another time only in that browser. Names below use the default IDs; Home Assistant may add a suffix if an ID already exists.
+Find all **38 sensors and 4 binary sensors** under **Settings → Devices & services → Almanac → Devices → Almanac**. Use them as automation triggers or conditions. They update every minute with the dashboard closed. Dragging the chart previews another time only in that browser. Names below use the default IDs; Home Assistant may add a suffix if an ID already exists.
 
 | Entities | Values |
 | --- | --- |
@@ -154,6 +154,12 @@ Positions are calculated offline using [JPL’s approximate planetary elements](
 ### Tonight’s Lineup
 
 Open the **Tonight’s Lineup** tab for local rise, transit (peak altitude), set, apparent magnitude and estimated visibility for all four planets. The window runs from the middle of the current local day to the middle of the next, so events after midnight appear under their own date. A dash means that event does not occur in the window. Magnitude is approximate and uses [published planetary brightness models](https://arxiv.org/abs/1808.01973). Visibility uses the planet's altitude and a solar elevation below −6°, with evening or morning opportunities listed when applicable.
+
+## ISS passes
+
+**Orbital / Look** draws the next predicted ISS pass as a dashed mint arc and shows a countdown with its local start time. Home Assistant fetches public ISS orbital elements from [CelesTrak](https://celestrak.org/NORAD/documentation/gp-data-formats.php) and predicts passes locally with SGP4. It looks up to five days ahead for an ISS segment at least 10° above the horizon, in sunlight, while the observer’s Sun is below −6°. Weather and obstructions can affect what you see.
+
+`sensor.almanac_next_iss_pass_start` is a timestamp sensor that updates even when the dashboard is closed. It is unknown when no pass can be predicted with fresh orbital data.
 
 ## Sensor Telemetry
 
@@ -271,6 +277,20 @@ actions:
       message: The Sun is below −18° and the Moon is below the horizon.
 ```
 
+### Notify when a predicted ISS pass starts
+
+```yaml
+alias: Almanac - ISS pass
+triggers:
+  - trigger: time
+    at: sensor.almanac_next_iss_pass_start
+actions:
+  - action: persistent_notification.create
+    data:
+      title: ISS pass
+      message: Open Almanac’s sky map for the predicted path.
+```
+
 ## Configure
 
 Use a panel view for the full-page design:
@@ -319,7 +339,7 @@ Rollback: disable the Almanac integration, reinstall the **Dashboard** package a
 
 ## Development
 
-To test the minimum supported version, install `homeassistant==2026.1.0` with Python 3.13. CI also runs the backend tests with `homeassistant==2026.11.0` in a Python 3.14 virtual environment. No JavaScript build step or npm dependencies are required. Keep the root `almanac-sky-card.js` and `custom_components/almanac/www/almanac-sky-card.js` identical when editing the card. Serve this directory with `python3 -m http.server 8000`, then open `http://localhost:8000/preview.html` for a demo with sample location data. Add `?time=2026-11-19T23:15:00Z` to freeze the demo clock for a reproducible sunset preview; this affects only the demo page.
+To test the minimum supported version, install `homeassistant==2026.1.0` and `sgp4==2.25` with Python 3.13. CI also runs the backend tests with `homeassistant==2026.11.0` in a Python 3.14 virtual environment. No JavaScript build step or npm dependencies are required. Keep the root `almanac-sky-card.js` and `custom_components/almanac/www/almanac-sky-card.js` identical when editing the card. Serve this directory with `python3 -m http.server 8000`, then open `http://localhost:8000/preview.html` for a demo with sample location data. Add `?time=2026-11-19T23:15:00Z` to freeze the demo clock for a reproducible sunset preview; this affects only the demo page.
 
 ```sh
 node --check almanac-sky-card.js

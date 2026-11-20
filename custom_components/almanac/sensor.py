@@ -43,6 +43,7 @@ DESCRIPTIONS = (
       for key, name in (
           ("dark_sky_window_start", "Dark sky window start"),
           ("dark_sky_window_end", "Dark sky window end"),
+          ("next_iss_pass_start", "Next ISS pass start"),
           ("next_sunrise", "Next sunrise"), ("next_sunset", "Next sunset"),
           ("next_dawn", "Next dawn"), ("next_dusk", "Next dusk"),
           ("next_solar_noon", "Next solar noon"), ("next_golden_hour", "Next evening golden hour"),

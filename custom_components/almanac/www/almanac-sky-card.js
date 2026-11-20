@@ -297,6 +297,8 @@ main [hidden]{display:none!important}
 .shell[data-theme=trek] .telemetry-grid>div{border-inline-start:6px solid var(--orange)}
 .shell[data-theme=trek] .telemetry-grid dt{text-transform:uppercase;letter-spacing:.05em}
 .shell[data-theme=trek] :is(#telemetry-view,#space-view){--tail:var(--lilac)}
+.iss-path{fill:none;stroke:#62e7c7;stroke-width:2;stroke-dasharray:4 3}
+.iss-countdown{display:block;width:max-content;max-width:100%;margin:4px auto 0;padding:2px 7px;border:1px dashed var(--mute);border-radius:99px;font-size:11px;text-align:center}
 .planet-readings{list-style:none;padding:0;margin:4px 0;font-size:12px}
 .planet-readings li{display:flex;justify-content:space-between;gap:5px}
 .planet-readings strong::before{content:"";display:inline-block;width:7px;height:7px;margin-inline-end:5px;border-radius:50%;background:var(--planet-color);border:1px solid var(--mute)}
@@ -421,7 +423,7 @@ h1{font-size:calc(clamp(22px,2.3vw,34px) * var(--text-scale));max-width:none;mar
  .shell[data-theme=trek] .console-chart{flex:1 1 0;min-height:0}
  .shell[data-theme=trek] .chart{min-height:112px}
  .shell[data-theme=trek] .p .lab{margin-bottom:5px}
- .shell[data-theme=trek] #map .map{max-width:clamp(115px,18vh,190px)}
+ .shell[data-theme=trek] #map .map{max-width:clamp(110px,16vh,175px)}
  .shell[data-theme=trek] #map .cap{display:none}
  .shell[data-theme=trek] .planet-readings{margin:2px 0;line-height:1.16}
  .shell[data-theme=trek] #sun .stats{gap:2px}
@@ -486,7 +488,7 @@ class AlmanacSky extends HTMLElement {
     this.timer = setInterval(() => {
       this.syncBackend();
       if (this.activeView === 3) this.syncSpaceWeather();
-      if (this.scrub == null) this.draw();
+      this.draw();
     }, 30000);
     if (this.key) this.init();
     this.syncBackend();
@@ -718,11 +720,20 @@ class AlmanacSky extends HTMLElement {
     const readings = planets.map(({name, alt, az, color}) =>
       `<li><strong style="--planet-color:${color}">${name}</strong> <span>${deg(alt)} · ${P16[Math.round(az / 22.5) % 16]} ${Math.round(az) % 360}°</span></li>`
     ).join('');
+    const iss = this.backend?.iss_pass;
+    const showISS = iss?.end > clock && Array.isArray(iss.points) && iss.points.length > 1;
+    const issPath = showISS ? iss.points.map(([alt, az], i) => {
+      const [x, y] = pt(alt, az);
+      return `${i ? 'L' : 'M'}${x.toFixed(2)},${y.toFixed(2)}`;
+    }).join(' ') : '';
+    const issStatus = showISS
+      ? `<span class="iss-countdown">ISS · ${iss.start <= clock ? 'Pass underway' : `in ${this.dur(iss.start - clock)} · ${this.fS.format(iss.start)} ${this.tm(iss.start)}`}</span>`
+      : '<span class="iss-countdown">ISS · No prediction available</span>';
     $('map-readout').innerHTML = `<svg class="map" viewBox="-128 -128 256 256" role="img" aria-label="Sky map: sun ${sunUp ? 'up' : 'down'} toward ${P16[Math.round(s.az / 22.5) % 16]}, moon ${moonUp ? 'up' : 'down'} toward ${P16[Math.round(m.az / 22.5) % 16]}">
 <circle r="100" fill="none" stroke="var(--ink)" stroke-opacity=".45"/><circle r="66.7" fill="none" stroke="var(--line)"/><circle r="33.3" fill="none" stroke="var(--line)"/><path d="M-100,0H100M0,-100V100" stroke="var(--line)"/>
 <text y="-108" text-anchor="middle">N</text><text y="119" text-anchor="middle">S</text><text x="112" y="4" text-anchor="middle">E</text><text x="-112" y="4" text-anchor="middle">W</text>
 <path d="${arc(D.sa, D.sz)}" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round"/><path d="${arc(D.ma, D.mz)}" fill="none" stroke="var(--moon)" stroke-width="2" stroke-linecap="round"/>
-${dot(s, sunUp, 'var(--sun)', 6)}${dot(m, moonUp, 'var(--moon)', 5)}${planetDots}</svg>${readings ? `<ul class="planet-readings" aria-label="Planet altitude and direction">${readings}</ul>` : ''}
+${dot(s, sunUp, 'var(--sun)', 6)}${dot(m, moonUp, 'var(--moon)', 5)}${planetDots}${issPath ? `<path class="iss-path" d="${issPath}"><title>Predicted ISS path</title></path>` : ''}</svg>${issStatus}${readings ? `<ul class="planet-readings" aria-label="Planet altitude and direction">${readings}</ul>` : ''}
 <p class="cap" style="margin:10px 0 0;text-align:center">Centre is straight overhead; the rim is the horizon. Dashed markers are below it.</p>`;
 
     if (this.cycleKey !== d0) { this.cycleKey = d0; this.cycle(now, d0); }
