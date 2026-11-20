@@ -145,6 +145,12 @@ Upcoming sunrise, twilight, solar noon, golden hour and moonrise/set sensors sea
 
 If the backend is temporarily unavailable, the card labels its browser-only fallback **Local calculations**. That fallback does not update sensor entities.
 
+## Bright planets
+
+Toggle **Planets** in **Orbital / Look** (called **Where to look** in the other themes) to plot Venus, Mars, Jupiter and Saturn. The dots and altitude, compass direction and azimuth readings update as you drag the timeline. Hollow dots on the rim mark planets below the horizon. The toggle is saved in your browser.
+
+Positions are calculated offline using [JPL’s approximate planetary elements](https://ssd.jpl.nasa.gov/planets/approx_pos.html) for 1800–2050. The map shows where to look. Daylight, clouds and obstructions affect whether you can see a planet.
+
 ## Tonight’s dark-sky window
 
 The timeline shades civil, nautical and astronomical twilight, then night. The mint strip marks times when the Sun is below −18° and the Moon is below Almanac’s apparent horizon (−0.833°). The chart shows intervals within its displayed local day.

@@ -19,6 +19,60 @@ function place(c, t, lat, lon) {
 }
 const sunAt = (t, la, lo) => place(sunC(days(t)), t, la, lo);
 const moonAt = (t, la, lo) => { const c = moonC(days(t)), p = place(c, t, la, lo); p.alt -= 0.95 * Math.cos(p.alt * R); p.dist = c.dist; return p; };
+// JPL approximate Keplerian elements, Table 1 (1800–2050).
+// Rows give a, e, inclination, mean longitude, perihelion and node, then their rates per century.
+const EARTH_ORBIT = [
+  [1.00000261, .01671123, -.00001531, 100.46457166, 102.93768193, 0],
+  [.00000562, -.00004392, -.01294668, 35999.37244981, .32327364, 0],
+];
+const PLANETS = [
+  { name: 'Venus', color: '#fbe1ac', orbit: [[.72333566, .00677672, 3.39467605, 181.97909950, 131.60246718, 76.67984255],
+    [.00000390, -.00004107, -.00078890, 58517.81538729, .00268329, -.27769418]] },
+  { name: 'Mars', color: '#ff906e', orbit: [[1.52371034, .09339410, 1.84969142, -4.55343205, -23.94362959, 49.55953891],
+    [.00001847, .00007882, -.00813131, 19140.30268499, .44441088, -.29257343]] },
+  { name: 'Jupiter', color: '#a8d7ff', orbit: [[5.20288700, .04838624, 1.30439695, 34.39644051, 14.72847983, 100.47390909],
+    [-.00011607, -.00013253, -.00183714, 3034.74612775, .21252668, .20469106]] },
+  { name: 'Saturn', color: '#e2adff', orbit: [[9.53667594, .05386179, 2.48599187, 49.95424423, 92.59887831, 113.66242448],
+    [-.00125060, -.00050991, .00193609, 1222.49362201, -.41897216, -.28867794]] },
+];
+
+function heliocentric([elements, rates], centuries) {
+  const [a, e, inclination, longitude, perihelion, node] =
+    elements.map((value, i) => value + rates[i] * centuries);
+  const anomaly = ((longitude - perihelion) % 360) * R;
+  let eccentric = anomaly;
+  for (let i = 0; i < 6; i++) {
+    eccentric -= (eccentric - e * Math.sin(eccentric) - anomaly) / (1 - e * Math.cos(eccentric));
+  }
+  const x = a * (Math.cos(eccentric) - e);
+  const y = a * Math.sqrt(1 - e * e) * Math.sin(eccentric);
+  const argument = (perihelion - node) * R;
+  const along = x * Math.cos(argument) - y * Math.sin(argument);
+  const across = x * Math.sin(argument) + y * Math.cos(argument);
+  const n = node * R;
+  const i = inclination * R;
+  return [
+    along * Math.cos(n) - across * Math.cos(i) * Math.sin(n),
+    along * Math.sin(n) + across * Math.cos(i) * Math.cos(n),
+    across * Math.sin(i),
+  ];
+}
+
+function planetsAt(time, lat, lon) {
+  const centuries = days(time) / 36525;
+  const earth = heliocentric(EARTH_ORBIT, centuries);
+  return PLANETS.map(({name, color, orbit}) => {
+    const [x, y, z] = heliocentric(orbit, centuries).map((value, i) => value - earth[i]);
+    const equatorialY = y * Math.cos(OBL) - z * Math.sin(OBL);
+    const equatorialZ = y * Math.sin(OBL) + z * Math.cos(OBL);
+    const coordinates = {
+      ra: Math.atan2(equatorialY, x),
+      dec: Math.atan2(equatorialZ, Math.hypot(x, equatorialY)),
+    };
+    return { name, color, ...place(coordinates, time, lat, lon) };
+  });
+}
+
 function illum(t) {
   const d = days(t), s = sunC(d), m = moonC(d), sd = 149598000;
   const phi = Math.acos(Math.sin(s.dec) * Math.sin(m.dec) + Math.cos(s.dec) * Math.cos(m.dec) * Math.cos(s.ra - m.ra));
@@ -187,6 +241,13 @@ button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--in
 .moonrow .name{font-family:var(--serif);font-size:calc(clamp(22px,2vw,28px) * var(--text-scale));line-height:1.1}
 .moonrow .cap{margin:6px 0 0}
 .map{display:block;width:100%;max-width:300px;margin:0 auto}
+#planet-toggle{display:block;margin:0 auto 6px;min-height:32px;font-size:12px;text-transform:none;letter-spacing:0}
+#planet-toggle[aria-pressed=true]{border-color:var(--moon);box-shadow:inset 0 0 0 1px var(--moon)}
+#map:has(#planet-toggle[aria-pressed=true]) .map{max-width:210px}
+.planet-readings{list-style:none;padding:0;margin:4px 0;font-size:12px}
+.planet-readings li{display:flex;justify-content:space-between;gap:5px}
+.planet-readings strong::before{content:"";display:inline-block;width:7px;height:7px;margin-inline-end:5px;border-radius:50%;background:var(--planet-color);border:1px solid var(--mute)}
+.map text.planet-label{paint-order:stroke;stroke:#111827;stroke-width:3px;stroke-linejoin:round;font-weight:700}
 .map text{font-family:var(--sans);font-size:calc(11px * var(--text-scale));fill:var(--mute)}
 .next{list-style:none;margin:0 0 14px;padding:0}
 .next li{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:calc(14px * var(--text-scale))}
@@ -402,7 +463,7 @@ class AlmanacSky extends HTMLElement {
 </header><section class="console-chart" aria-label="Daily sky chart"><div class="bar"><div class="key"><span>Sun</span><span class="m">Moon</span></div><div class="live" id="live"></div></div>
 <div class="chart" id="chart" tabindex="0" role="slider" aria-label="Time of day. Drag or use arrow keys to preview the sky; Escape returns to now."><div id="plot"></div></div>
 <div class="twilight-key"><span>Civil twilight</span><span>Nautical twilight</span><span>Astronomical twilight</span><span>Night</span><span>Moonless dark sky</span></div><p class="hint">Drag across the day to see the sky at any hour.</p></section>
-<div class="grid"><section class="p" id="sun"></section><section class="p" id="moon"></section><section class="p" id="map"></section><section class="p" id="cycle"></section><span class="rail-footer">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div>
+<div class="grid"><section class="p" id="sun"></section><section class="p" id="moon"></section><section class="p" id="map">${panelHeading('Where to look', 'ORBITAL / LOOK', 158)}<button type="button" id="planet-toggle" aria-pressed="false">Planets</button><div id="map-readout"></div></section><section class="p" id="cycle"></section><span class="rail-footer">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div>
 </main><dialog id="settings-dialog" class="theme-dialog" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">Almanac settings</h2><button id="settings-close" class="settings-close" type="button">Done</button></div><p class="settings-note">Choose a theme. Saved for Almanac in this browser. Original follows daylight, sunset and night.</p><div class="theme-grid">${THEMES.map(([id, name, description, background, accent]) => `<button type="button" class="theme-choice" data-theme-choice="${id}" aria-pressed="false"><span class="theme-swatch" aria-hidden="true" style="background:linear-gradient(135deg,${background} 55%,${accent} 56%)"></span><span><strong>${name}</strong><small>${description}</small></span></button>`).join('')}</div></dialog></div>`;
     const $ = id => this.shadowRoot.getElementById(id);
     $('home').setAttribute('href', this.config.home_path || '/lovelace/0');
@@ -413,6 +474,15 @@ class AlmanacSky extends HTMLElement {
     dialog.addEventListener('close', () => $('settings').focus());
     dialog.addEventListener('click', e => { const button = e.target.closest('[data-theme-choice]'); if (button) this.chooseTheme(button.dataset.themeChoice); });
     this.applyTheme();
+    const planetToggle = $('planet-toggle');
+    try { this.showPlanets = localStorage.getItem('almanac.planets') === 'true'; } catch (_) {}
+    planetToggle.setAttribute('aria-pressed', String(Boolean(this.showPlanets)));
+    planetToggle.addEventListener('click', () => {
+      this.showPlanets = !this.showPlanets;
+      planetToggle.setAttribute('aria-pressed', String(this.showPlanets));
+      try { localStorage.setItem('almanac.planets', String(this.showPlanets)); } catch (_) {}
+      this.draw();
+    });
     const chart = $('chart');
     const seek = e => { const r = chart.getBoundingClientRect(), k = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); const start = this.dayStart(Date.now()), end = this.nextStart(start); this.scrub = Math.min(end, start + Math.round(k * (end - start) / 3e5) * 3e5); this.draw(); };
     chart.addEventListener('pointerdown', e => { chart.setPointerCapture(e.pointerId); this.drag = true; seek(e); });
@@ -521,11 +591,30 @@ class AlmanacSky extends HTMLElement {
     const pt = (alt, az, r = 100) => { const q = (90 - Math.max(0, alt)) / 90 * r; return [q * Math.sin(az * R), -q * Math.cos(az * R)]; };
     const arc = (al, az) => { let d = '', pen = false; for (let i = 0; i < al.length; i += 3) { if (al[i] > 0) { const [x, y] = pt(al[i], az[i]); d += `${pen ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`; pen = true; } else pen = false; } return d; };
     const dot = (p, up, col, r) => { const [x, y] = pt(p.alt, p.az); return up ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r + 5}" fill="${col}" opacity=".22"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${col}"/>` : `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="none" stroke="${col}" stroke-width="1.5" stroke-dasharray="2.5 2.5"/>`; };
-    $('map').innerHTML = `${panelHeading('Where to look', 'ORBITAL / LOOK', 158)}<svg class="map" viewBox="-128 -128 256 256" role="img" aria-label="Sky map: sun ${sunUp ? 'up' : 'down'} toward ${P16[Math.round(s.az / 22.5) % 16]}, moon ${moonUp ? 'up' : 'down'} toward ${P16[Math.round(m.az / 22.5) % 16]}">
+    const planets = this.showPlanets ? planetsAt(T, this.lat, this.lon) : [];
+    const markers = planets.map(planet => {
+      const [x, y] = pt(planet.alt, planet.az);
+      return { ...planet, x, y };
+    }).sort((a, b) => a.y - b.y);
+    let previousLabel = -126;
+    const planetDots = markers.map((planet, index) => {
+      const {x, y, alt, color, name} = planet;
+      const latestY = 116 - 13 * (markers.length - 1 - index);
+      const labelY = Math.min(latestY, Math.max(y - 7, previousLabel + 13));
+      previousLabel = labelY;
+      const labelX = x + (x > 0 ? -7 : 7);
+      return `<path d="M${x.toFixed(2)},${y.toFixed(2)}L${labelX.toFixed(2)},${labelY.toFixed(2)}" stroke="${color}" opacity=".65"/>
+        <circle cx="${x}" cy="${y}" r="3.5" fill="${alt >= 0 ? color : 'var(--bg1)'}" stroke="${color}"/>
+        <text class="planet-label" x="${labelX}" y="${labelY}" text-anchor="${x > 0 ? 'end' : 'start'}" style="fill:${color}">${name}</text>`;
+    }).join('');
+    const readings = planets.map(({name, alt, az, color}) =>
+      `<li><strong style="--planet-color:${color}">${name}</strong> <span>${deg(alt)} · ${P16[Math.round(az / 22.5) % 16]} ${Math.round(az) % 360}°</span></li>`
+    ).join('');
+    $('map-readout').innerHTML = `<svg class="map" viewBox="-128 -128 256 256" role="img" aria-label="Sky map: sun ${sunUp ? 'up' : 'down'} toward ${P16[Math.round(s.az / 22.5) % 16]}, moon ${moonUp ? 'up' : 'down'} toward ${P16[Math.round(m.az / 22.5) % 16]}">
 <circle r="100" fill="none" stroke="var(--ink)" stroke-opacity=".45"/><circle r="66.7" fill="none" stroke="var(--line)"/><circle r="33.3" fill="none" stroke="var(--line)"/><path d="M-100,0H100M0,-100V100" stroke="var(--line)"/>
 <text y="-108" text-anchor="middle">N</text><text y="119" text-anchor="middle">S</text><text x="112" y="4" text-anchor="middle">E</text><text x="-112" y="4" text-anchor="middle">W</text>
 <path d="${arc(D.sa, D.sz)}" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round"/><path d="${arc(D.ma, D.mz)}" fill="none" stroke="var(--moon)" stroke-width="2" stroke-linecap="round"/>
-${dot(s, sunUp, 'var(--sun)', 6)}${dot(m, moonUp, 'var(--moon)', 5)}</svg>
+${dot(s, sunUp, 'var(--sun)', 6)}${dot(m, moonUp, 'var(--moon)', 5)}${planetDots}</svg>${readings ? `<ul class="planet-readings" aria-label="Planet altitude and direction">${readings}</ul>` : ''}
 <p class="cap" style="margin:10px 0 0;text-align:center">Centre is straight overhead; the rim is the horizon. Dashed markers are below it.</p>`;
 
     if (this.cycleKey !== d0) { this.cycleKey = d0; this.cycle(now, d0); }
