@@ -9,6 +9,34 @@ A local sun and moon integration for Home Assistant, with continuously updated s
 [![Open in HACS or Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=yanke7&repository=Home-Assistant-Almanac&category=integration)
 
 
+## Theme gallery
+
+Choose a theme with the gear on the card. These previews show the same sunset in Saskatoon so you can compare palettes. Select an image to see it full size.
+
+### Star Trek
+
+[![Star Trek dashboard with the orbital sensors badge, sky chart and segmented instrument panels](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/trek.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/trek.jpg)
+
+[![Close-up of Solar Metrics, Lunar Telemetry, Orbital / Look and the four-week calendar](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/trek-instruments.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/trek-instruments.jpg)
+
+| Original | Brushed Steel |
+| --- | --- |
+| [![Original dashboard](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/original.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/original.jpg) | [![Brushed Steel dashboard](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/steel.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/steel.jpg) |
+
+| Amber Relay | Neon Grid |
+| --- | --- |
+| [![Amber Relay dashboard](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/relay.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/relay.jpg) | [![Neon Grid dashboard](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/neon.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/neon.jpg) |
+
+| Midnight Drift | Aqua Current |
+| --- | --- |
+| [![Midnight Drift dashboard](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/abyss.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/abyss.jpg) | [![Aqua Current dashboard](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/tide.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/tide.jpg) |
+
+### Follow Appearance
+
+This preview shows the fallback colours. With the Appearance dashboard resource loaded, Almanac follows your shared palette, font and text size.
+
+[![Follow Appearance dashboard using fallback colours](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/appearance.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/appearance.jpg)
+
 ## Watch the sky change
 
 ![Almanac changing from daylight through sunset and twilight to night](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/day-to-night.gif)
