@@ -41,6 +41,8 @@ DESCRIPTIONS = (
                                      "full_moon", "waning_gibbous", "last_quarter", "waning_crescent"], icon="mdi:moon-waxing-crescent"),
     *(SensorEntityDescription(key=key, name=name, device_class=SensorDeviceClass.TIMESTAMP)
       for key, name in (
+          ("dark_sky_window_start", "Dark sky window start"),
+          ("dark_sky_window_end", "Dark sky window end"),
           ("next_sunrise", "Next sunrise"), ("next_sunset", "Next sunset"),
           ("next_dawn", "Next dawn"), ("next_dusk", "Next dusk"),
           ("next_solar_noon", "Next solar noon"), ("next_golden_hour", "Next evening golden hour"),

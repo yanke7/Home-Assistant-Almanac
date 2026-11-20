@@ -111,7 +111,7 @@ Use the **Settings** gear beside Home on the Almanac card to choose a theme. The
 
 ## Sensors for automations
 
-Find all **35 sensors and 3 binary sensors** under **Settings → Devices & services → Almanac → Devices → Almanac**. Use them as automation triggers or conditions. They update every minute with the dashboard closed. Dragging the chart previews another time only in that browser. Names below use the default IDs; Home Assistant may add a suffix if an ID already exists.
+Find all **37 sensors and 4 binary sensors** under **Settings → Devices & services → Almanac → Devices → Almanac**. Use them as automation triggers or conditions. They update every minute with the dashboard closed. Dragging the chart previews another time only in that browser. Names below use the default IDs; Home Assistant may add a suffix if an ID already exists.
 
 | Entities | Values |
 | --- | --- |
@@ -144,6 +144,18 @@ The **today** timestamps keep their value after the event until local midnight. 
 Upcoming sunrise, twilight, solar noon, golden hour and moonrise/set sensors search the remainder of today and the following two local days. When no event occurs in that window (for example during polar night), the event is `unknown`. Daylight duration still reports zero or the full local-day length during polar night/day. Values are approximate and not intended for navigation. Sensor timestamps are stored in UTC and displayed in your Home Assistant time zone.
 
 If the backend is temporarily unavailable, the card labels its browser-only fallback **Local calculations**. That fallback does not update sensor entities.
+
+## Tonight’s dark-sky window
+
+The timeline shades civil, nautical and astronomical twilight, then night. The mint strip marks times when the Sun is below −18° and the Moon is below Almanac’s apparent horizon (−0.833°). The chart shows intervals within its displayed local day.
+
+| Entity | What it reports |
+| --- | --- |
+| `sensor.almanac_dark_sky_window_start` | Start of the current or next moonless dark-sky window |
+| `sensor.almanac_dark_sky_window_end` | End of that same window |
+| `binary_sensor.almanac_moonless_dark_sky` | `on` when the live sky meets both conditions |
+
+The sensors keep the same pair of timestamps throughout an active window, including across midnight. Almanac searches through the next two local days and reports `unknown` for missing windows or endpoints beyond its search range. Conditions are based on Sun and Moon positions. Clouds and light pollution affect actual visibility.
 
 ## Example automations
 
@@ -204,6 +216,22 @@ actions:
     data:
       title: Full moon
       message: The moon has reached its predicted full phase.
+```
+
+### Notify when a moonless dark-sky window begins
+
+```yaml
+alias: Almanac - Moonless dark sky
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.almanac_moonless_dark_sky
+    from: "off"
+    to: "on"
+actions:
+  - action: persistent_notification.create
+    data:
+      title: Moonless dark sky
+      message: The Sun is below −18° and the Moon is below the horizon.
 ```
 
 ## Configure
