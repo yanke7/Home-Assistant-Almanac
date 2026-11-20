@@ -21,7 +21,7 @@ for(const [zone,start,end] of [
       setAttribute(k,v){this[k]=v;},setPointerCapture(){},getBoundingClientRect(){return {left:0,width:100};}};
   }
   now=first+12*3600000;
-  Object.assign(card,{isConnected:true,config:{},shadowRoot:{getElementById:element},draw(){}});
+  Object.assign(card,{isConnected:true,config:{},shadowRoot:{getElementById:element,querySelectorAll(){return [];}},draw(){}});
   card.hass={config:{latitude:41,longitude:-88,time_zone:zone}};
   for(const instant of [first,now,last-1])assert.equal(card.dayStart(instant),first);
   assert.equal(card.dayStart(last),last);
