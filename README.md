@@ -15,6 +15,22 @@ A local sun and moon integration for Home Assistant, with continuously updated s
 
 [Open the 1080p video with sound](https://github.com/yanke7/Home-Assistant-Almanac/releases/download/v2.10.1/almanac-overview-1080p.mp4)
 
+## Dashboard features
+
+| Feature | What you can see or do |
+| --- | --- |
+| **Interactive sky chart** | Drag or use the arrow keys to see how the Sun, Moon, and planets move throughout the local day. Press Escape or **Back to now** to return to the live sky. The chart separates civil, nautical, and astronomical twilight from night. A mint strip marks [moonless dark-sky windows](#tonights-dark-sky-window). |
+| **Solar and lunar instruments** | See sunrise, sunset, first and last light, solar noon and its elevation, evening golden hour, and the change in daylight since yesterday. The Moon panel shows phase, tilt, illumination, altitude, compass direction, rise and set, age, and distance. The four-week calendar shows daily phases and upcoming phase transitions. |
+| **Orbital / Look sky map** | See Sun and Moon paths and the positions of Venus, Mars, Jupiter, and Saturn. Planet labels and altitude, compass direction, and azimuth follow the timeline. A dashed arc and countdown show the [next predicted visible ISS pass](#iss-passes). |
+| **Tonight’s Lineup** | Compare local rise, transit, and set times, apparent magnitude, and estimated evening or morning visibility for the four [bright planets](#bright-planets). Events after midnight carry their own date. |
+| **Sensor Telemetry** | Use [Home Assistant weather or sensor entities](#sensor-telemetry) for cloud cover, seeing, transparency, temperature, and dew point. A condensation warning appears when the air temperature is within 2°C of the dew point or below it. |
+| **Subspace / Solar Weather** | See NOAA’s [planetary Kp, solar wind speed, and Bz](#subspace--solar-weather). A location-based aurora alert combines NOAA’s OVATION forecast with local darkness. Individual readings show when they were recorded. |
+| **Stardate and events** | Browse or pause the [header ticker](#stardate--astronomical-events) as it cycles through upcoming Moon phases, estimated meteor peaks with ideal hourly rates and local moonlight estimates, and equinox or solstice countdowns. |
+| **Home Assistant automations** | Use [38 sensors and 4 binary sensors](#sensors-for-automations) as triggers or conditions, even with the dashboard closed. [Copyable examples](#example-automations) cover twilight lighting, bright moonrise, full Moon reminders, moonless darkness, and ISS passes. |
+| **Themes, languages, and layouts** | Choose from [eight themes](#theme-gallery), including Star Trek and Follow Appearance, and [eleven languages](#languages). Settings remember your theme, language, and planet overlay choice in each browser. The card fits wide panels and stacks its instruments on phones. |
+
+Almanac uses the location and time zone already configured in Home Assistant. Sun, Moon, planet, and astronomical event calculations run locally, including the interactive chart’s browser fallback. **Solar Weather and updated ISS predictions need internet access** from Home Assistant to reach NOAA and CelesTrak. Sensor Telemetry uses data from your configured Home Assistant entities.
+
 ## Theme gallery
 
 Choose a theme with the gear on the card. These Almanac v2.10.1 screenshots show the same sunset in Saskatoon so you can compare palettes. The preview uses local calculations. Select an image to see it full size.
@@ -56,17 +72,6 @@ The same card adapts to a narrow screen, with a touch-friendly sky chart and ver
 | Daylight | Sunset | Night |
 | --- | --- | --- |
 | [![Almanac on a phone in daylight](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-daylight.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-daylight-full.jpg) | [![Almanac on a phone in sunset](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-sunset.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-sunset-full.jpg) | [![Almanac on a phone in night](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-night.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/phone-night-full.jpg) |
-
-Almanac uses your Home Assistant latitude, longitude, and time zone. The backend updates its sensors every minute, even with all browsers closed. The bundled card uses the same backend readings for its live display and matching local calculations for interactive previews. No external astronomy APIs, API keys, or subscriptions are required.
-
-- A plain-language summary of the next sun and moon events.
-- An interactive daily altitude chart: drag or use arrow keys to explore; Escape returns to now.
-- Sun elevation, first and last light, solar noon, golden hour, and daylight change.
-- Moon phase, tilt, altitude, direction, rise and set, age, and distance.
-- A sky map and four-week moon phase calendar.
-- Almanac logo in the header, bundled into the card for offline use.
-- Colors that follow night, twilight, golden hour, and daylight.
-- A responsive full-page layout with scrolling on phones.
 
 ## From daylight to night
 
