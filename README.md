@@ -117,7 +117,7 @@ Meteor peaks are estimated from typical solar longitudes. Each entry shows the i
 
 ### Languages
 
-Choose **Language** in the card’s Settings. The browser saves the preference and applies it to the ticker, navigation, data labels and local date formatting. Available languages are English, French, Dutch, German, Spanish, Tagalog, Swedish, Italian, Polish, Danish and Norwegian Bokmål. Some explanatory and accessibility text remains in English.
+Choose **Language** in the card’s Settings. The browser saves the preference and applies it to the dashboard, ticker, Settings descriptions, help and accessibility labels, and local date and duration formatting. Available languages are English, French, Dutch, German, Spanish, Tagalog, Swedish, Italian, Polish, Danish and Norwegian Bokmål.
 
 ## Sensors for automations
 
