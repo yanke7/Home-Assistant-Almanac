@@ -158,6 +158,47 @@ const LANGUAGES = { en: 'English', fr: 'Français', nl: 'Nederlands', de: 'Deuts
 const LANGUAGE_CODES = Object.keys(LANGUAGES);
 // Translations follow the language order in LANGUAGES, omitting English.
 const TRANSLATIONS = {
+  "Settings": ["Réglages", "Instellingen", "Einstellungen", "Ajustes", "Mga setting", "Inställningar", "Impostazioni", "Ustawienia", "Indstillinger", "Innstillinger"],
+  "Original": ["Original", "Origineel", "Original", "Original", "Orihinal", "Original", "Originale", "Oryginalny", "Original", "Original"],
+  "Brushed Steel": ["Acier brossé", "Geborsteld staal", "Gebürsteter Stahl", "Acero cepillado", "Brinas na bakal", "Borstat stål", "Acciaio spazzolato", "Stal szczotkowana", "Børstet stål", "Børstet stål"],
+  "Amber Relay": ["Relais ambré", "Amberrelais", "Bernsteinrelais", "Relé ámbar", "Relay na ambar", "Bärnstensrelä", "Relè ambrato", "Bursztynowy przekaźnik", "Ravrelæ", "Ravrelé"],
+  "Neon Grid": ["Grille néon", "Neonraster", "Neonraster", "Cuadrícula neón", "Neon na grid", "Neonrutnät", "Griglia neon", "Neonowa siatka", "Neongitter", "Neonrutenett"],
+  "Midnight Drift": ["Dérive de minuit", "Middernachtdrift", "Mitternachtsdrift", "Deriva nocturna", "Pag-anod sa hatinggabi", "Midnattsdrift", "Deriva di mezzanotte", "Nocny dryf", "Midnatsdrift", "Midnattsdrift"],
+  "Aqua Current": ["Courant turquoise", "Turkooizen stroom", "Türkisströmung", "Corriente turquesa", "Agos na turkesa", "Turkos ström", "Corrente turchese", "Turkusowy nurt", "Turkis strøm", "Turkis strøm"],
+  "Follow Appearance": ["Suivre l’apparence", "Uiterlijk volgen", "Erscheinungsbild übernehmen", "Seguir apariencia", "Sundin ang hitsura", "Följ utseendet", "Segui aspetto", "Użyj ustawień wyglądu", "Følg udseende", "Følg utseendet"],
+  "The sky changes with daylight, sunset and night": ["Le ciel change avec le jour, le coucher du soleil et la nuit", "De hemel verandert met daglicht, zonsondergang en nacht", "Der Himmel ändert sich bei Tageslicht, Sonnenuntergang und Nacht", "El cielo cambia con la luz del día, el atardecer y la noche", "Nagbabago ang langit sa araw, paglubog ng araw at gabi", "Himlen skiftar med dagsljus, solnedgång och natt", "Il cielo cambia con la luce del giorno, il tramonto e la notte", "Niebo zmienia się za dnia, o zachodzie słońca i w nocy", "Himlen skifter med dagslys, solnedgang og nat", "Himmelen skifter med dagslys, solnedgang og natt"],
+  "An industrial silver and charcoal console": ["Console industrielle argent et anthracite", "Industriële console in zilver en antraciet", "Industriekonsole in Silber und Anthrazit", "Consola industrial plateada y gris carbón", "Pang-industriyang konsol na pilak at uling", "Industrikonsol i silver och kolgrått", "Console industriale argento e antracite", "Przemysłowa konsola w srebrze i graficie", "Industrikonsol i sølv og koksgrå", "Industrikonsoll i sølv og koksgrått"],
+  "Warm amber instruments and olive tones": ["Instruments ambrés et tons olive", "Warme amberkleurige instrumenten en olijftinten", "Warme bernsteinfarbene Instrumente und Olivtöne", "Instrumentos en ámbar cálido y tonos oliva", "Maiinit na ambar at kulay oliba", "Varma bärnstensfärgade instrument och olivtoner", "Strumenti ambrati e toni oliva", "Ciepłe bursztynowe wskaźniki i odcienie oliwki", "Varme ravfarvede instrumenter og oliventoner", "Varme ravfargede instrumenter og oliventoner"],
+  "Cyan light and magenta accents": ["Lumière cyan et accents magenta", "Cyaan licht en magenta accenten", "Cyanfarbenes Licht und magentafarbene Akzente", "Luz cian y detalles magenta", "Liwanag na cyan at mga detalyeng magenta", "Cyanbelysning och magenta detaljer", "Luce ciano e accenti magenta", "Cyjanowe światło i akcenty magenty", "Cyan lys og magentafarvede detaljer", "Cyan lys og magentafargede detaljer"],
+  "Deep blue with a soft lunar glow": ["Bleu profond et douce lueur lunaire", "Diepblauw met een zachte maangloed", "Tiefblau mit sanftem Mondschein", "Azul profundo con un suave brillo lunar", "Malalim na asul na may banayad na liwanag ng buwan", "Djupblått med mjukt månskimmer", "Blu profondo con un tenue bagliore lunare", "Głęboki błękit z delikatną poświatą Księżyca", "Dybblå med blødt måneskær", "Dypblått med mykt måneskinn"],
+  "Teal glass and sea-green highlights": ["Verre turquoise et touches vert d’eau", "Turkoois glas en zeegroene accenten", "Türkisglas und meergrüne Akzente", "Cristal turquesa y detalles verde mar", "Salaming turkesa at mga detalyeng luntiang-dagat", "Turkost glas och havsgröna detaljer", "Vetro turchese e dettagli verde mare", "Turkusowe szkło i morskie akcenty", "Turkis glas og havgrønne detaljer", "Turkist glass og sjøgrønne detaljer"],
+  "Amber controls and lilac panel rails": ["Commandes ambrées et bordures lilas", "Amberkleurige bediening en lila paneelranden", "Bernsteinfarbene Bedienelemente und fliederfarbene Rahmen", "Controles ámbar y bordes lila", "Mga kontrol na ambar at gilid na lila", "Bärnstensfärgade reglage och lila panelramar", "Comandi ambrati e bordi lilla", "Bursztynowe elementy sterujące i liliowe obramowania", "Ravfarvede knapper og lilla panelkanter", "Ravfargede knapper og lilla panelkanter"],
+  "Use your shared palette, font and text size": ["Utilise la palette, la police et la taille de texte partagées", "Gebruik je gedeelde palet, lettertype en tekstgrootte", "Gemeinsame Palette, Schriftart und Schriftgröße verwenden", "Usa la paleta, la fuente y el tamaño de texto compartidos", "Gamitin ang nakabahaging paleta, font at laki ng teksto", "Använd delad palett, teckensnitt och textstorlek", "Usa tavolozza, carattere e dimensione del testo condivisi", "Używa wspólnej palety, czcionki i rozmiaru tekstu", "Brug den delte palet, skrifttype og tekststørrelse", "Bruk delt palett, skrifttype og tekststørrelse"],
+  "Almanac views": ["Vues d’Almanac", "Almanac-weergaven", "Almanac-Ansichten", "Vistas de Almanac", "Mga view ng Almanac", "Almanacs vyer", "Viste di Almanac", "Widoki Almanac", "Almanac-visninger", "Almanac-visninger"],
+  "Daily sky chart": ["Carte du ciel de la journée", "Dagelijkse hemelgrafiek", "Tagesverlauf des Himmels", "Gráfico diario del cielo", "Tsart ng langit sa maghapon", "Dagens himmelsdiagram", "Grafico giornaliero del cielo", "Dzienny wykres nieba", "Dagens himmelgraf", "Dagens himmelgraf"],
+  "Time of day. Drag or use arrow keys to preview the sky; Escape returns to now.": ["Heure. Faites glisser ou utilisez les flèches pour explorer le ciel. Échap revient au présent.", "Tijdstip. Sleep of gebruik de pijltjestoetsen. Escape keert terug naar nu.", "Uhrzeit. Ziehen oder Pfeiltasten verwenden. Escape kehrt zur aktuellen Zeit zurück.", "Hora del día. Arrastra o usa las flechas para ver el cielo. Escape vuelve a la hora actual.", "Oras ng araw. I-drag o gamitin ang mga arrow key. Pindutin ang Escape para bumalik sa ngayon.", "Tid på dagen. Dra eller använd piltangenterna. Escape återgår till nu.", "Ora del giorno. Trascina o usa le frecce. Esc torna all’ora attuale.", "Pora dnia. Przeciągnij lub użyj klawiszy strzałek. Escape wraca do bieżącej pory.", "Tidspunkt på dagen. Træk eller brug piletasterne. Escape vender tilbage til nu.", "Tid på dagen. Dra eller bruk piltastene. Escape går tilbake til nå."],
+  "Sky map": ["Carte du ciel", "Hemelkaart", "Himmelskarte", "Mapa celeste", "Mapa ng langit", "Himmelskarta", "Mappa celeste", "Mapa nieba", "Himmelkort", "Himmelkart"],
+  "Predicted ISS path": ["Trajectoire prévue de l’ISS", "Voorspelde ISS-baan", "Vorhergesagte ISS-Bahn", "Trayectoria prevista de la EEI", "Tinatayang landas ng ISS", "Beräknad ISS-bana", "Traiettoria prevista della ISS", "Przewidywana trajektoria ISS", "Forventet ISS-bane", "Forventet ISS-bane"],
+  "Planet altitude and direction": ["Hauteur et direction des planètes", "Hoogte en richting van planeten", "Höhe und Richtung der Planeten", "Altitud y dirección de los planetas", "Taas at direksiyon ng mga planeta", "Planeternas höjd och riktning", "Altezza e direzione dei pianeti", "Wysokość i kierunek planet", "Planeternes højde og retning", "Planetenes høyde og retning"],
+  "Centre is straight overhead; the rim is the horizon. Dashed markers are below it.": ["Le centre est le zénith, le bord est l’horizon. Les repères en pointillés sont sous l’horizon.", "Het midden is het zenit. De rand is de horizon. Gestippelde markeringen liggen eronder.", "Die Mitte ist der Zenit, der Rand der Horizont. Gestrichelte Markierungen liegen darunter.", "El centro es el cénit y el borde, el horizonte. Las marcas discontinuas quedan por debajo.", "Ang gitna ay ang tuktok ng langit at ang gilid ay ang abot-tanaw. Nasa ibaba ang mga putol-putol na marka.", "Mitten är zenit och kanten är horisonten. Streckade markörer ligger nedanför.", "Il centro è lo zenit e il bordo è l’orizzonte. Gli indicatori tratteggiati sono sotto l’orizzonte.", "Środek to zenit, a krawędź to horyzont. Przerywane znaczniki leżą poniżej.", "Midten er zenit, og kanten er horisonten. Stiplede markører ligger nedenunder.", "Midten er senit, og kanten er horisonten. Stiplede markører ligger nedenfor."],
+  "Planet events and visibility": ["Événements et visibilité des planètes", "Planeetgebeurtenissen en zichtbaarheid", "Planetenereignisse und Sichtbarkeit", "Eventos y visibilidad de los planetas", "Mga kaganapan at pagkakakita sa mga planeta", "Planethändelser och synlighet", "Eventi e visibilità dei pianeti", "Zjawiska i widoczność planet", "Planetbegivenheder og synlighed", "Planethendelser og synlighet"],
+  "Apparent magnitude": ["Magnitude apparente", "Schijnbare magnitude", "Scheinbare Helligkeit", "Magnitud aparente", "Nakikitang liwanag", "Skenbar magnitud", "Magnitudine apparente", "Jasność obserwowana", "Tilsyneladende lysstyrke", "Tilsynelatende lysstyrke"],
+  "Transit is peak altitude. A dash means the event falls outside this window. Visibility is estimated from the horizon and civil twilight.": ["Le transit correspond à la hauteur maximale. Un tiret indique un événement hors de la période. La visibilité est estimée selon l’horizon et le crépuscule civil.", "Doorgang is de hoogste stand. Een streepje betekent dat de gebeurtenis buiten deze periode valt. Zichtbaarheid hangt af van de horizon en burgerlijke schemering.", "Der Transit ist der höchste Stand. Ein Strich bedeutet, dass das Ereignis außerhalb des Zeitfensters liegt. Die Sichtbarkeit wird aus Horizont und bürgerlicher Dämmerung geschätzt.", "El tránsito es la altura máxima. Un guion indica que el evento queda fuera del intervalo. La visibilidad se estima según el horizonte y el crepúsculo civil.", "Ang transito ang pinakamataas na posisyon. Ang gitling ay nangangahulugang wala sa saklaw ng oras ang kaganapan. Tinataya ang pagkakakita ayon sa abot-tanaw at sibil na takipsilim.", "Passagen är den högsta höjden. Ett streck betyder att händelsen ligger utanför tidsintervallet. Synligheten uppskattas utifrån horisonten och borgerlig skymning.", "Il transito è l’altezza massima. Un trattino indica che l’evento è fuori intervallo. La visibilità è stimata in base all’orizzonte e al crepuscolo civile.", "Górowanie to najwyższe położenie. Kreska oznacza zdarzenie poza tym okresem. Widoczność szacuje się na podstawie horyzontu i zmierzchu cywilnego.", "Passagen er den største højde. En streg betyder, at begivenheden ligger uden for perioden. Synligheden vurderes ud fra horisonten og borgerligt tusmørke.", "Passasjen er høyeste høyde. En strek betyr at hendelsen er utenfor perioden. Synlighet anslås ut fra horisonten og borgerlig skumring."],
+  "Times are local. Aurora potential uses the OVATION forecast near your location. Clouds and light pollution affect visibility.": ["Les heures sont locales. Le potentiel d’aurore provient des prévisions OVATION locales. Les nuages et la pollution lumineuse affectent la visibilité.", "Tijden zijn lokaal. De kans op poollicht volgt de OVATION-verwachting voor jouw omgeving. Wolken en lichtvervuiling beïnvloeden het zicht.", "Alle Zeiten sind Ortszeiten. Das Polarlichtpotenzial beruht auf der regionalen OVATION-Prognose. Wolken und Lichtverschmutzung beeinflussen die Sicht.", "Las horas son locales. La probabilidad de aurora se basa en el pronóstico OVATION para tu zona. Las nubes y la contaminación lumínica afectan a la visibilidad.", "Lokal ang mga oras. Batay sa pagtataya ng OVATION sa iyong lugar ang posibilidad ng aurora. Nakaaapekto ang ulap at polusyon sa liwanag sa pagkakakita.", "Tiderna är lokala. Norrskenschansen baseras på OVATION-prognosen för din plats. Moln och ljusföroreningar påverkar sikten.", "Gli orari sono locali. Il potenziale aurorale si basa sulle previsioni OVATION per la tua zona. Nuvole e inquinamento luminoso incidono sulla visibilità.", "Podano czas lokalny. Potencjał zorzy wynika z prognozy OVATION dla Twojej okolicy. Chmury i zanieczyszczenie światłem wpływają na widoczność.", "Tiderne er lokale. Chancen for polarlys følger OVATION-prognosen for dit område. Skyer og lysforurening påvirker synligheden.", "Tidene er lokale. Muligheten for polarlys bygger på OVATION-varselet for ditt område. Skyer og lysforurensning påvirker synligheten."],
+  "Almanac sun and moon logo": ["Logo soleil et lune d’Almanac", "Almanac-logo met zon en maan", "Almanac-Logo mit Sonne und Mond", "Logotipo de Almanac con el Sol y la Luna", "Logo ng Almanac na may araw at buwan", "Almanacs sol- och månlogotyp", "Logo di Almanac con sole e luna", "Logo Almanac ze Słońcem i Księżycem", "Almanacs sol- og månelogo", "Almanacs sol- og månelogo"],
+  "Almanac and Orbital Sensors badge": ["Insigne Almanac et capteurs orbitaux", "Almanac-embleem met orbitale sensoren", "Almanac-Abzeichen für Orbitalsensoren", "Insignia de Almanac y sensores orbitales", "Sagisag ng Almanac at mga sensor sa orbita", "Almanacs emblem för omloppssensorer", "Distintivo Almanac e sensori orbitali", "Emblemat Almanac i czujników orbitalnych", "Almanacs mærke for kredsløbssensorer", "Almanacs merke for banesensorer"],
+  "Planetary Kp": ["Kp planétaire", "Planetaire Kp", "Planetarer Kp", "Kp planetario", "Planetaryong Kp", "Planetärt Kp", "Kp planetario", "Planetarny Kp", "Planetarisk Kp", "Planetarisk Kp"],
+  "now": ["maintenant", "nu", "jetzt", "ahora", "ngayon", "nu", "ora", "teraz", "nu", "nå"],
+  "high": ["de hauteur", "hoog", "hoch", "de altura", "ang taas", "högt", "di altezza", "wysokości", "højt", "høyt"],
+  "Geminids": ["Géminides", "Geminiden", "Geminiden", "Gemínidas", "Geminids", "Geminiderna", "Geminidi", "Geminidy", "Geminiderne", "Geminidene"],
+  "Ursids": ["Ursides", "Ursiden", "Ursiden", "Úrsidas", "Ursids", "Ursiderna", "Ursidi", "Ursydy", "Ursiderne", "Ursidene"],
+  "Quadrantids": ["Quadrantides", "Quadrantiden", "Quadrantiden", "Cuadrántidas", "Quadrantids", "Kvadrantiderna", "Quadrantidi", "Kwadrantydy", "Kvadrantiderne", "Kvadrantidene"],
+  "Lyrids": ["Lyrides", "Lyriden", "Lyriden", "Líridas", "Lyrids", "Lyriderna", "Liridi", "Lirydy", "Lyriderne", "Lyridene"],
+  "Eta Aquariids": ["Êta aquarides", "Eta-Aquariden", "Eta-Aquariiden", "Eta acuáridas", "Eta Aquariids", "Eta-Aquariderna", "Eta Aquaridi", "Eta Akwarydy", "Eta-Aquariderne", "Eta-akvaridene"],
+  "Perseids": ["Perséides", "Perseïden", "Perseiden", "Perseidas", "Perseids", "Perseiderna", "Perseidi", "Perseidy", "Perseiderne", "Perseidene"],
+  "Orionids": ["Orionides", "Orioniden", "Orioniden", "Oriónidas", "Orionids", "Orioniderna", "Orionidi", "Orionidy", "Orioniderne", "Orionidene"],
+  "Leonids": ["Léonides", "Leoniden", "Leoniden", "Leónidas", "Leonids", "Leoniderna", "Leonidi", "Leonidy", "Leoniderne", "Leonidene"],
+  "in {duration}": ["dans {duration}", "over {duration}", "in {duration}", "en {duration}", "sa loob ng {duration}", "om {duration}", "tra {duration}", "za {duration}", "om {duration}", "om {duration}"],
   "lit": ["éclairée", "verlicht", "beleuchtet", "iluminada", "maliwanag", "belyst", "illuminata", "oświetlenia", "belyst", "belyst"],
   "waxing": ["croissante", "wassend", "zunehmend", "creciente", "lumalaki", "tilltagande", "crescente", "przybywa", "tiltagende", "voksende"],
   "waning": ["décroissante", "afnemend", "abnehmend", "menguante", "humihina", "avtagande", "calante", "ubywa", "aftagende", "avtagende"],
@@ -638,7 +679,7 @@ class AlmanacSky extends HTMLElement {
     const badge = this.shadowRoot.getElementById('brand-logo');
     if (badge) {
       badge.src = this.theme === 'trek' ? TREK_BADGE : LOGO;
-      badge.alt = this.theme === 'trek' ? 'Almanac and Orbital Sensors badge' : 'Almanac sun and moon logo';
+      badge.alt = this.tr(this.theme === 'trek' ? 'Almanac and Orbital Sensors badge' : 'Almanac sun and moon logo');
     }
     if (this.theme === 'appearance') this.syncAppearance();
     else window.YankeAppearance?.releaseViewport?.(shell);
@@ -728,6 +769,13 @@ class AlmanacSky extends HTMLElement {
     const F = o => new Intl.DateTimeFormat(lang, { timeZone: this.tz, ...o });
     this.fT = F({ hour: 'numeric', minute: '2-digit', hour12: h12 }); this.fH = F({ hour: 'numeric', hour12: h12 });
     this.fD = F({ weekday: 'long', month: 'long', day: 'numeric' }); this.fS = F({ weekday: 'short', month: 'short', day: 'numeric' });
+    const unitFormat = (unit, precision = 0) => new Intl.NumberFormat(lang, {
+      style: 'unit', unit, unitDisplay: 'short', maximumFractionDigits: precision,
+    });
+    this.hourFormat = unitFormat('hour');
+    this.minuteFormat = unitFormat('minute');
+    this.secondFormat = unitFormat('second');
+    this.ageFormat = unitFormat('day', 1);
     this.eventDate = F({month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: h12});
     this.relativeDays = new Intl.RelativeTimeFormat(lang, {numeric: 'auto'});
     this.fN = F({ day: 'numeric' }); this.fM = F({ month: 'short', day: 'numeric' });
@@ -737,18 +785,18 @@ class AlmanacSky extends HTMLElement {
     const ns = this.lat >= 0 ? 'N' : 'S', ew = this.lon >= 0 ? 'E' : 'W';
     this.releaseAppearance();
     this.shadowRoot.innerHTML = `<style>${CSS}</style><div id="shell" lang="${this.language}" class="shell" data-sky="night"><div class="stars">${stars}</div><main>
-<header class="console-header"><div class="top"><div class="brand"><img id="brand-logo" class="brand-logo" src="${LOGO}" alt="Almanac sun and moon logo" width="64" height="64"><strong class="trek-title">Almanac</strong><span class="brand-location"><span class="brand-prefix">Almanac · </span>${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div><div class="header-actions"><a id="home">← ${this.tr('Home')}</a><button id="settings" class="settings-open" type="button" aria-label="${this.tr('Almanac settings')}" aria-haspopup="dialog" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.9 7.9 0 0 0 0-2l2-1.5-2-3.5-2.3 1a8 8 0 0 0-1.7-1L15 3h-4l-.4 3a8 8 0 0 0-1.7 1L6.6 6l-2 3.5 2 1.5a7.9 7.9 0 0 0 0 2l-2 1.5 2 3.5 2.3-1a8 8 0 0 0 1.7 1l.4 3h4l.4-3a8 8 0 0 0 1.7-1l2.3 1 2-3.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg></button></div></div>
+<header class="console-header"><div class="top"><div class="brand"><img id="brand-logo" class="brand-logo" src="${LOGO}" alt="${this.tr('Almanac sun and moon logo')}" width="64" height="64"><strong class="trek-title">Almanac</strong><span class="brand-location"><span class="brand-prefix">Almanac · </span>${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div><div class="header-actions"><a id="home">← ${this.tr('Home')}</a><button id="settings" class="settings-open" type="button" aria-label="${this.tr('Almanac settings')}" aria-haspopup="dialog" title="${this.tr('Settings')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.9 7.9 0 0 0 0-2l2-1.5-2-3.5-2.3 1a8 8 0 0 0-1.7-1L15 3h-4l-.4 3a8 8 0 0 0-1.7 1L6.6 6l-2 3.5 2 1.5a7.9 7.9 0 0 0 0 2l-2 1.5 2 3.5 2.3-1a8 8 0 0 0 1.7 1l.4 3h4l.4-3a8 8 0 0 0 1.7-1l2.3 1 2-3.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg></button></div></div>
 <h1 id="head"></h1><p class="sub" id="sub"></p>
 <section class="event-ticker" aria-label="${this.tr('Astronomical events')}"><div class="event-copy"><strong id="stardate"></strong><span id="event-text"></span></div><div class="event-controls">
 <button type="button" id="event-previous" aria-label="${this.tr('Previous')}">‹</button><button type="button" id="event-pause" aria-label="${this.tr('Pause')}">Ⅱ</button><button type="button" id="event-next" aria-label="${this.tr('Next')}">›</button>
 </div></section>
-</header><div class="view-tabs" role="tablist" aria-label="Almanac views"><button id="sky-tab" type="button" role="tab" aria-controls="sky-view" aria-selected="true">${this.tr('Sky')}</button><button id="lineup-tab" type="button" role="tab" aria-controls="lineup-view" aria-selected="false" tabindex="-1">${this.tr('Tonight’s Lineup')}</button><button id="telemetry-tab" type="button" role="tab" aria-controls="telemetry-view" aria-selected="false" tabindex="-1">${this.tr('Sensor Telemetry')}</button><button id="space-tab" type="button" role="tab" aria-controls="space-view" aria-selected="false" tabindex="-1">${this.tr('Subspace / Solar Weather')}</button></div>
-<div id="sky-view" role="tabpanel" aria-labelledby="sky-tab" style="display:contents"><section class="console-chart" aria-label="Daily sky chart"><div class="bar"><div class="key"><span>${this.tr('Sun')}</span><span class="m">${this.tr('Moon')}</span></div><div class="live" id="live"></div></div>
-<div class="chart" id="chart" tabindex="0" role="slider" aria-label="Time of day. Drag or use arrow keys to preview the sky; Escape returns to now."><div id="plot"></div></div>
+</header><div class="view-tabs" role="tablist" aria-label="${this.tr('Almanac views')}"><button id="sky-tab" type="button" role="tab" aria-controls="sky-view" aria-selected="true">${this.tr('Sky')}</button><button id="lineup-tab" type="button" role="tab" aria-controls="lineup-view" aria-selected="false" tabindex="-1">${this.tr('Tonight’s Lineup')}</button><button id="telemetry-tab" type="button" role="tab" aria-controls="telemetry-view" aria-selected="false" tabindex="-1">${this.tr('Sensor Telemetry')}</button><button id="space-tab" type="button" role="tab" aria-controls="space-view" aria-selected="false" tabindex="-1">${this.tr('Subspace / Solar Weather')}</button></div>
+<div id="sky-view" role="tabpanel" aria-labelledby="sky-tab" style="display:contents"><section class="console-chart" aria-label="${this.tr('Daily sky chart')}"><div class="bar"><div class="key"><span>${this.tr('Sun')}</span><span class="m">${this.tr('Moon')}</span></div><div class="live" id="live"></div></div>
+<div class="chart" id="chart" tabindex="0" role="slider" aria-label="${this.tr('Time of day. Drag or use arrow keys to preview the sky; Escape returns to now.')}"><div id="plot"></div></div>
 <div class="twilight-key"><span>${this.tr('Civil twilight')}</span><span>${this.tr('Nautical twilight')}</span><span>${this.tr('Astronomical twilight')}</span><span>${this.tr('Night')}</span><span>${this.tr('Moonless dark sky')}</span></div><p class="hint">${this.tr('Drag across the day to see the sky at any hour.')}</p></section>
 <div class="grid"><section class="p" id="sun"></section><section class="p" id="moon"></section><section class="p" id="map">${this.heading('Where to look', 'ORBITAL / LOOK', 158)}<div id="map-readout"></div></section><section class="p" id="cycle"></section><span class="rail-footer">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div>
 </div><section class="p" id="lineup-view" role="tabpanel" aria-labelledby="lineup-tab" hidden></section><section class="p" id="telemetry-view" role="tabpanel" aria-labelledby="telemetry-tab" hidden></section><section class="p" id="space-view" role="tabpanel" aria-labelledby="space-tab" hidden></section>
-</main><dialog id="settings-dialog" class="theme-dialog" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">${this.tr('Almanac settings')}</h2><button id="settings-close" class="settings-close" type="button">${this.tr('Done')}</button></div><label class="planet-setting">${this.tr('Language')} <select id="almanac-language">${LANGUAGE_CODES.map(code => `<option value="${code}">${LANGUAGES[code]}</option>`).join('')}</select></label><p class="settings-note">${this.tr('Choose a theme')}</p><div class="theme-grid">${THEMES.map(([id, name, description, background, accent]) => `<button type="button" class="theme-choice" data-theme-choice="${id}" aria-pressed="false"><span class="theme-swatch" aria-hidden="true" style="background:linear-gradient(135deg,${background} 55%,${accent} 56%)"></span><span><strong>${name}</strong><small>${description}</small></span></button>`).join('')}</div><label class="planet-setting"><input type="checkbox" id="planet-toggle"> Show planets on the sky map</label></dialog></div>`;
+</main><dialog id="settings-dialog" class="theme-dialog" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">${this.tr('Almanac settings')}</h2><button id="settings-close" class="settings-close" type="button">${this.tr('Done')}</button></div><label class="planet-setting">${this.tr('Language')} <select id="almanac-language">${LANGUAGE_CODES.map(code => `<option value="${code}">${LANGUAGES[code]}</option>`).join('')}</select></label><p class="settings-note">${this.tr('Choose a theme')}</p><div class="theme-grid">${THEMES.map(([id, name, description, background, accent]) => `<button type="button" class="theme-choice" data-theme-choice="${id}" aria-pressed="false"><span class="theme-swatch" aria-hidden="true" style="background:linear-gradient(135deg,${background} 55%,${accent} 56%)"></span><span><strong>${this.tr(name)}</strong><small>${this.tr(description)}</small></span></button>`).join('')}</div><label class="planet-setting"><input type="checkbox" id="planet-toggle"> Show planets on the sky map</label></dialog></div>`;
     const $ = id => this.shadowRoot.getElementById(id);
     $('home').setAttribute('href', this.config.home_path || '/lovelace/0');
     $('home').addEventListener('click', e => { e.preventDefault(); history.pushState(null, '', e.currentTarget.getAttribute('href')); window.dispatchEvent(new CustomEvent('location-changed')); });
@@ -796,7 +844,7 @@ class AlmanacSky extends HTMLElement {
     });
     const tabs = [$('sky-tab'), $('lineup-tab'), $('telemetry-tab'), $('space-tab')];
     const panels = [$('sky-view'), $('lineup-view'), $('telemetry-view'), $('space-view')];
-    this.activeView = 0;
+    const previousView = this.activeView ?? 0;
     const selectTab = index => {
       this.activeView = index;
       panels.forEach((panel, i) => { panel.hidden = i !== index; });
@@ -833,6 +881,7 @@ class AlmanacSky extends HTMLElement {
     this.ro?.disconnect();
     this.ro = new ResizeObserver(en => { const w = Math.round(en[0].contentRect.width), hh = Math.round(en[0].contentRect.height); if (w && (w !== this.W || hh !== this.Hc)) { this.W = w; this.Hc = hh; this.draw(); } });
     this.ro.observe(chart);
+    selectTab(previousView);
   }
 
   civilDate(t) {
@@ -874,7 +923,12 @@ class AlmanacSky extends HTMLElement {
     if (this.cache.size > 6) this.cache.delete(this.cache.keys().next().value);
     this.cache.set(d0, d); return d;
   }
-  dur(ms) { const m = Math.round(Math.abs(ms) / 6e4), h = Math.floor(m / 60); return h ? `${h} h ${m % 60} m` : `${m} m`; }
+  dur(ms) {
+    const minutes = Math.round(Math.abs(ms) / 6e4);
+    const hours = Math.floor(minutes / 60);
+    const remainder = this.minuteFormat.format(minutes % 60);
+    return hours ? `${this.hourFormat.format(hours)} ${remainder}` : remainder;
+  }
   tm(t) { return t ? this.fT.format(t) : '—'; }
   dayTag(t, d0) { const n = (this.civilDate(t) - this.civilDate(d0)) / DAY; return n === 1 ? this.tr('tomorrow') : n > 1 ? this.fS.format(t) : ''; }
 
@@ -923,17 +977,17 @@ class AlmanacSky extends HTMLElement {
 
     // sun
     const Y = this.day(this.dayStart(d0 - 1)), diff = D.len != null && Y.len != null ? D.len - Y.len : null;
-    const ds = diff == null ? '—' : `${diff < 0 ? '−' : '+'}${Math.floor(Math.abs(diff) / 6e4)} m ${Math.round(Math.abs(diff) % 6e4 / 1e3)} s`;
+    const ds = diff == null ? '—' : `${diff < 0 ? '−' : '+'}${this.minuteFormat.format(Math.floor(Math.abs(diff) / 6e4))} ${this.secondFormat.format(Math.round(Math.abs(diff) % 6e4 / 1e3))}`;
     const st = (k, v, x) => `<div><dt>${this.tr(k)}</dt><dd>${v}${x ? ` <small>${x}</small>` : ''}</dd></div>`;
     const deg = v => `${v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}°`;
     $('sun').innerHTML = `${this.heading('Sun', 'SOLAR METRICS', 155, D.len == null ? '' : Math.round(100 * D.len / (D.end - d0)) + '%')}<div class="big s">${deg(s.alt)}</div>
 <p class="cap">${this.tr(sunUp ? 'Above horizon' : 'Below horizon')} · ${P16[Math.round(s.az / 22.5) % 16]} ${Math.round(s.az)}°</p>
-<dl class="stats">${st('Sunrise', this.tm(D.rise))}${st('Sunset', this.tm(D.set))}${st('First light', this.tm(D.dawn))}${st('Last light', this.tm(D.dusk))}${st('Solar noon', this.tm(D.noon), `${D.noonAlt.toFixed(0)}° high`)}${st('Golden hour', this.tm(D.golden))}${st('Daylight', D.len == null ? '—' : this.dur(D.len))}${st('Since yesterday', ds)}</dl>`;
+<dl class="stats">${st('Sunrise', this.tm(D.rise))}${st('Sunset', this.tm(D.set))}${st('First light', this.tm(D.dawn))}${st('Last light', this.tm(D.dusk))}${st('Solar noon', this.tm(D.noon), `${D.noonAlt.toFixed(0)}° ${this.tr('high')}`)}${st('Golden hour', this.tm(D.golden))}${st('Daylight', D.len == null ? '—' : this.dur(D.len))}${st('Since yesterday', ds)}</dl>`;
 
     // moon
     const rot = -((il.ang - m.pa) / R) - 90;
     $('moon').innerHTML = `${this.heading('Moon', 'LUNAR TELEMETRY', 179, pct + '%')}<div class="moonrow">${moonSvg(118, il.f, rot, true)}<div><div class="name">${this.tr(name)}</div><p class="cap">${pct}% ${this.tr('lit')} · ${this.tr(il.phase < 0.5 ? 'waxing' : 'waning')}</p></div></div>
-<dl class="stats">${st('Altitude', deg(m.alt), this.tr(moonUp ? 'up' : 'down'))}${st('Direction', `${P16[Math.round(m.az / 22.5) % 16]} ${Math.round(m.az)}°`)}${moonUp && mRose ? st('Rose', this.tm(mRose), mRose < d0 ? this.tr('yesterday') : '') : st('Rises', this.tm(mRise), mRise ? this.dayTag(mRise, d0) : '')}${st('Sets', this.tm(mSet), mSet ? this.dayTag(mSet, d0) : '')}${st('Age', `${(il.phase * 29.53).toFixed(1)} days`)}${st('Distance', `${Math.round(m.dist / 100) * 100 >= 1e3 ? (Math.round(m.dist / 100) * 100).toLocaleString('en-US') : m.dist} km`)}</dl>`;
+<dl class="stats">${st('Altitude', deg(m.alt), this.tr(moonUp ? 'up' : 'down'))}${st('Direction', `${P16[Math.round(m.az / 22.5) % 16]} ${Math.round(m.az)}°`)}${moonUp && mRose ? st('Rose', this.tm(mRose), mRose < d0 ? this.tr('yesterday') : '') : st('Rises', this.tm(mRise), mRise ? this.dayTag(mRise, d0) : '')}${st('Sets', this.tm(mSet), mSet ? this.dayTag(mSet, d0) : '')}${st('Age', this.ageFormat.format(il.phase * 29.53))}${st('Distance', `${Math.round(m.dist / 100) * 100 >= 1e3 ? (Math.round(m.dist / 100) * 100).toLocaleString(this.language) : m.dist} km`)}</dl>`;
 
     // sky map
     const pt = (alt, az, r = 100) => { const q = (90 - Math.max(0, alt)) / 90 * r; return [q * Math.sin(az * R), -q * Math.cos(az * R)]; };
@@ -965,14 +1019,14 @@ class AlmanacSky extends HTMLElement {
       return `${i ? 'L' : 'M'}${x.toFixed(2)},${y.toFixed(2)}`;
     }).join(' ') : '';
     const issStatus = showISS
-      ? `<span class="iss-countdown">ISS · ${iss.start <= clock ? this.tr('Pass underway') : `in ${this.dur(iss.start - clock)} · ${this.fS.format(iss.start)} ${this.tm(iss.start)}`}</span>`
+      ? `<span class="iss-countdown">ISS · ${iss.start <= clock ? this.tr('Pass underway') : `${this.tr('in {duration}').replace('{duration}', this.dur(iss.start - clock))} · ${this.fS.format(iss.start)} ${this.tm(iss.start)}`}</span>`
       : `<span class="iss-countdown">ISS · ${this.tr('No prediction available')}</span>`;
-    $('map-readout').innerHTML = `<svg class="map" viewBox="-128 -128 256 256" role="img" aria-label="Sky map: sun ${sunUp ? 'up' : 'down'} toward ${P16[Math.round(s.az / 22.5) % 16]}, moon ${moonUp ? 'up' : 'down'} toward ${P16[Math.round(m.az / 22.5) % 16]}">
+    $('map-readout').innerHTML = `<svg class="map" viewBox="-128 -128 256 256" role="img" aria-label="${this.tr('Sky map')} · ${this.tr('Sun')} ${this.tr(sunUp ? 'Above horizon' : 'Below horizon')} ${P16[Math.round(s.az / 22.5) % 16]} · ${this.tr('Moon')} ${this.tr(moonUp ? 'Above horizon' : 'Below horizon')} ${P16[Math.round(m.az / 22.5) % 16]}">
 <circle r="100" fill="none" stroke="var(--ink)" stroke-opacity=".45"/><circle r="66.7" fill="none" stroke="var(--line)"/><circle r="33.3" fill="none" stroke="var(--line)"/><path d="M-100,0H100M0,-100V100" stroke="var(--line)"/>
 <text y="-108" text-anchor="middle">N</text><text y="119" text-anchor="middle">S</text><text x="112" y="4" text-anchor="middle">E</text><text x="-112" y="4" text-anchor="middle">W</text>
 <path d="${arc(D.sa, D.sz)}" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round"/><path d="${arc(D.ma, D.mz)}" fill="none" stroke="var(--moon)" stroke-width="2" stroke-linecap="round"/>
-${dot(s, sunUp, 'var(--sun)', 6)}${dot(m, moonUp, 'var(--moon)', 5)}${planetDots}${issPath ? `<path class="iss-path" d="${issPath}"><title>Predicted ISS path</title></path>` : ''}</svg>${issStatus}${readings ? `<ul class="planet-readings" aria-label="Planet altitude and direction">${readings}</ul>` : ''}
-<p class="cap" style="margin:10px 0 0;text-align:center">Centre is straight overhead; the rim is the horizon. Dashed markers are below it.</p>`;
+${dot(s, sunUp, 'var(--sun)', 6)}${dot(m, moonUp, 'var(--moon)', 5)}${planetDots}${issPath ? `<path class="iss-path" d="${issPath}"><title>${this.tr('Predicted ISS path')}</title></path>` : ''}</svg>${issStatus}${readings ? `<ul class="planet-readings" aria-label="${this.tr('Planet altitude and direction')}">${readings}</ul>` : ''}
+<p class="cap" style="margin:10px 0 0;text-align:center">${this.tr('Centre is straight overhead; the rim is the horizon. Dashed markers are below it.')}</p>`;
 
     if (this.cycleKey !== d0) { this.cycleKey = d0; this.cycle(now, d0); }
   }
@@ -1018,7 +1072,7 @@ ${observation('Solar wind speed', data.wind, value => `${Math.round(value)} km/s
 ${observation('Bz (GSM)', data.bz, value => `${value.toFixed(1)} nT · ${this.tr(value < 0 ? 'South' : value > 0 ? 'North' : 'Neutral')}`)}
 ${observation('Local aurora index', aurora && {value: aurora.local_index, time: aurora.time}, value => `${value} / 100`)}
 </dl>
-<p class="cap">NOAA SWPC · Times are local. Aurora potential uses the OVATION forecast near your location. Clouds and light pollution affect visibility.</p>`;
+<p class="cap">NOAA SWPC · ${this.tr('Times are local. Aurora potential uses the OVATION forecast near your location. Clouds and light pollution affect visibility.')}</p>`;
     if (this.spaceMarkup !== html || !panel.firstChild) {
       this.spaceMarkup = html;
       panel.innerHTML = html;
@@ -1060,7 +1114,7 @@ ${observation('Local aurora index', aurora && {value: aurora.local_index, time: 
     const warning = spread != null && spread <= 2 + 1e-8;
     const formatTemp = value => value == null ? this.tr('Unavailable') : `${value.toFixed(1)} °C`;
     const percentageTile = (label, value) => `<div><dt>${this.tr(label)}</dt><dd>${value == null ? this.tr('Unavailable') :
-      `${Math.round(value)}%<meter aria-label="${label}" min="0" max="100" value="${value}"></meter>`}</dd></div>`;
+      `${Math.round(value)}%<meter aria-label="${this.tr(label)}" min="0" max="100" value="${value}"></meter>`}</dd></div>`;
     const seeing = states[config.seeing_entity];
     const seeingArcseconds = ['″', '"', 'arcsec'].includes(seeing?.attributes?.unit_of_measurement);
     const seeingValue = numeric(seeing?.state);
@@ -1130,8 +1184,8 @@ ${percentageTile('Transparency', percentage(states[config.transparency_entity]?.
       return `<tr><th scope="row">${this.tr(planet.name)}</th><td>${stamp(rise)}</td><td>${stamp(transit)}</td><td>${stamp(set)}</td><td>${magnitude}</td><td><span class="lineup-status" data-visible="${visible}">${this.tr(status)}</span></td></tr>`;
     });
     panel.innerHTML = `<h2>${this.tr('Tonight’s Lineup')}</h2><p class="cap">${stamp(start)} – ${stamp(end)} · ${this.tr('Local time')}</p>
-<div class="lineup-scroll" tabindex="0" aria-label="Planet events and visibility"><table class="lineup-table"><thead><tr><th scope="col">${this.tr('Planet')}</th><th scope="col">${this.tr('Rise')}</th><th scope="col">${this.tr('Transit')}</th><th scope="col">${this.tr('Set')}</th><th scope="col"><abbr title="Apparent magnitude">Mag.</abbr></th><th scope="col">${this.tr('Visibility')}</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>
-<p class="cap">Transit is peak altitude. A dash means the event falls outside this window. Visibility is estimated from the horizon and civil twilight.</p>`;
+<div class="lineup-scroll" tabindex="0" aria-label="${this.tr('Planet events and visibility')}"><table class="lineup-table"><thead><tr><th scope="col">${this.tr('Planet')}</th><th scope="col">${this.tr('Rise')}</th><th scope="col">${this.tr('Transit')}</th><th scope="col">${this.tr('Set')}</th><th scope="col"><abbr title="${this.tr('Apparent magnitude')}">Mag.</abbr></th><th scope="col">${this.tr('Visibility')}</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>
+<p class="cap">${this.tr('Transit is peak altitude. A dash means the event falls outside this window. Visibility is estimated from the horizon and civil twilight.')}</p>`;
   }
 
   plot(D, T, s, m) {
@@ -1164,7 +1218,7 @@ ${bands}<rect width="${W}" height="${y0}" fill="url(#ribbon)" mask="url(#fm)" op
 <rect y="${y0 - 3}" width="${W}" height="6" rx="3" fill="url(#ribbon)"/>
 ${lab(D.rise, y0 + 19, 'var(--sun)', `↑ ${this.tm(D.rise)}`)}${lab(D.set, y0 + 19, 'var(--sun)', `↓ ${this.tm(D.set)}`)}${mev}
 <path d="M${X.toFixed(1)},${top - 4}V${bot}" stroke="var(--ink)" stroke-width="1.5"/>
-<text x="${(X + (end ? -7 : 7)).toFixed(1)}" y="13" text-anchor="${end ? 'end' : 'start'}" style="fill:var(--ink);font-weight:600;letter-spacing:.08em">${this.scrub == null ? 'NOW' : this.tm(T)}</text>
+<text x="${(X + (end ? -7 : 7)).toFixed(1)}" y="13" text-anchor="${end ? 'end' : 'start'}" style="fill:var(--ink);font-weight:600;letter-spacing:.08em">${this.scrub == null ? this.tr('now').toLocaleUpperCase(this.language) : this.tm(T)}</text>
 <circle cx="${X.toFixed(1)}" cy="${y(m.alt).toFixed(1)}" r="6" fill="var(--moon)" stroke="var(--bg2)" stroke-width="2"/><circle cx="${X.toFixed(1)}" cy="${y(s.alt).toFixed(1)}" r="7.5" fill="var(--sun)" stroke="var(--bg2)" stroke-width="2"/></svg>`;
   }
 
