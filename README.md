@@ -64,7 +64,7 @@ Deep navy panels, stars, and a glowing moon.
 
 ## Install with Marketplace or HACS
 
-Requires Home Assistant **2026.11 or newer**.
+Requires Home Assistant **2026.1.0 or newer** (Almanac v2.3.1 onward).
 
 1. Use the badge above, or add `https://github.com/yanke7/Home-Assistant-Almanac` as a custom repository with category **Integration**.
 2. Download Almanac. Restart Home Assistant if requested so it discovers the new integration.
@@ -225,7 +225,7 @@ Rollback: disable the Almanac integration, reinstall the **Dashboard** package a
 
 ## Development
 
-For backend tests, install `homeassistant==2026.11.0` in a Python 3.14 virtual environment. No JavaScript build step or npm dependencies are required. Keep the root `almanac-sky-card.js` and `custom_components/almanac/www/almanac-sky-card.js` identical when editing the card. Serve this directory with `python3 -m http.server 8000`, then open `http://localhost:8000/preview.html` for a demo with sample location data. Add `?time=2026-11-19T23:15:00Z` to freeze the demo clock for a reproducible sunset preview; this affects only the demo page.
+To test the minimum supported version, install `homeassistant==2026.1.0` with Python 3.13. CI also runs the backend tests with `homeassistant==2026.11.0` in a Python 3.14 virtual environment. No JavaScript build step or npm dependencies are required. Keep the root `almanac-sky-card.js` and `custom_components/almanac/www/almanac-sky-card.js` identical when editing the card. Serve this directory with `python3 -m http.server 8000`, then open `http://localhost:8000/preview.html` for a demo with sample location data. Add `?time=2026-11-19T23:15:00Z` to freeze the demo clock for a reproducible sunset preview; this affects only the demo page.
 
 ```sh
 node --check almanac-sky-card.js
