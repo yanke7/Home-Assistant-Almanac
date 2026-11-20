@@ -79,7 +79,7 @@ The repository can be installed by URL while catalog review is pending. The inte
 
 Use the **Settings** gear beside Home on the Almanac card to choose a theme. The choice applies immediately and is remembered in this browser; different phones and wall displays can use different themes.
 
-**Original** is the default and preserves the automatic daylight, sunset, twilight, and night colours. Other options are **Brushed Steel**, **Amber Relay**, **Neon Grid**, **Midnight Drift**, **Aqua Current**, **Star Trek**, and **Follow Home Assistant**. Follow Home Assistant uses your active Home Assistant colours and font. The theme only changes appearance; sensors and astronomical calculations stay the same.
+**Original** is the default and preserves the automatic daylight, sunset, twilight, and night colours. Other options are **Brushed Steel**, **Amber Relay**, **Neon Grid**, **Midnight Drift**, **Aqua Current**, **Star Trek**, and **Follow Appearance**. Follow Appearance uses the shared palette, font, and text size when the Appearance dashboard resource is loaded. Otherwise it uses your active Home Assistant colours and font. The theme only changes appearance; sensors and astronomical calculations stay the same.
 
 ## Sensors for automations
 

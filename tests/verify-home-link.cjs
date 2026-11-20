@@ -16,6 +16,7 @@ for (const file of ['almanac-sky-card.js', 'custom_components/almanac/www/almana
     card.shadowRoot = {
       set innerHTML(value) { markup = value; },
       getElementById(id) {
+        if (id === 'shell') return null;
         if (id !== 'home') throw stop;
         return { setAttribute(name, value) { attributes[name] = value; }, addEventListener() {} };
       },
