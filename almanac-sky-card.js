@@ -288,6 +288,15 @@ main [hidden]{display:none!important}
  .lineup-table th,.lineup-table td{padding:8px 5px}
  .lineup-table{font-size:12px}
 }
+.telemetry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px;margin:0}
+.telemetry-grid>div{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.telemetry-grid dt{color:var(--mute);font-size:13px}.telemetry-grid dd{margin:5px 0 0;font-size:20px}
+.telemetry-grid meter{display:block;width:100%;height:10px;margin-top:6px;accent-color:var(--sun)}
+.dew-status{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:5px 12px}
+.dew-status.warning{background:#ffc36d;color:#241407;font-weight:800}
+.shell[data-theme=trek] .telemetry-grid>div{border-inline-start:6px solid var(--orange)}
+.shell[data-theme=trek] .telemetry-grid dt{text-transform:uppercase;letter-spacing:.05em}
+.shell[data-theme=trek] #telemetry-view{--tail:var(--lilac)}
 .planet-readings{list-style:none;padding:0;margin:4px 0;font-size:12px}
 .planet-readings li{display:flex;justify-content:space-between;gap:5px}
 .planet-readings strong::before{content:"";display:inline-block;width:7px;height:7px;margin-inline-end:5px;border-radius:50%;background:var(--planet-color);border:1px solid var(--mute)}
@@ -401,6 +410,27 @@ h1{font-size:calc(clamp(22px,2.3vw,34px) * var(--text-scale));max-width:none;mar
 .shell[data-theme=trek] .next small{background:var(--lilac);color:#110f14;border-radius:12px;padding:2px 5px}
 .shell[data-theme=trek] .next li:nth-child(even) small{background:var(--gold)}
 .shell[data-theme=trek] .cal{border-top:3px solid var(--lilac);padding-top:5px}
+/* On wide screens the chart takes the space left by the header and instruments. */
+@container(min-width:1100px){@media(min-height:680px){
+ .shell[data-theme=trek]{padding:8px clamp(10px,1vw,18px);overflow:auto}
+ .shell[data-theme=trek] main{gap:5px}
+ .shell[data-theme=trek] .brand-logo{width:clamp(95px,11vh,140px)}
+ .shell[data-theme=trek] .console-header{padding-left:clamp(108px,13vh,160px)}
+ .shell[data-theme=trek] h1{font-size:clamp(24px,min(2.7vw,5vh),48px);margin:4px 0}
+ .shell[data-theme=trek] .view-tabs{margin:2px 0}
+ .shell[data-theme=trek] .console-chart{flex:1 1 0;min-height:0}
+ .shell[data-theme=trek] .chart{min-height:112px}
+ .shell[data-theme=trek] .p .lab{margin-bottom:5px}
+ .shell[data-theme=trek] #map .map{max-width:clamp(115px,18vh,190px)}
+ .shell[data-theme=trek] #map .cap{display:none}
+ .shell[data-theme=trek] .planet-readings{margin:2px 0;line-height:1.16}
+ .shell[data-theme=trek] #sun .stats{gap:2px}
+ .shell[data-theme=trek] #sun .stats dt{padding-block:0}
+ .shell[data-theme=trek] #moon .moonrow{min-height:0;margin-bottom:6px}
+ .shell[data-theme=trek] #moon .stats{gap:4px}
+ .shell[data-theme=trek] .next li{margin:2px 0}
+ .shell[data-theme=trek] .cal div{gap:0}
+}}
 @container(max-width:640px){
  .shell[data-theme=trek] .console-header{padding-left:0;border-right-width:9px}
  .shell[data-theme=trek] .top{padding-left:76px;min-height:74px}
@@ -446,6 +476,7 @@ class AlmanacSky extends HTMLElement {
   set hass(h) {
     const key = [h.config.latitude, h.config.longitude, h.config.time_zone, h.locale?.language, h.locale?.time_format].join();
     this._hass = h;
+    if (this.activeView === 2 && this.isConnected) this.renderTelemetry();
     if (key !== this.key) { this.key = key; this.backend = null; this.chartKey = null; this.lastFetch = 0; this.cache.clear(); this.midnights.clear(); this.scrub = null; this.cycleKey = null; this.init(); }
     this.syncAppearance();
     this.syncBackend();
@@ -504,12 +535,12 @@ class AlmanacSky extends HTMLElement {
     this.shadowRoot.innerHTML = `<style>${CSS}</style><div id="shell" class="shell" data-sky="night"><div class="stars">${stars}</div><main>
 <header class="console-header"><div class="top"><div class="brand"><img id="brand-logo" class="brand-logo" src="${LOGO}" alt="Almanac sun and moon logo" width="64" height="64"><strong class="trek-title">Almanac</strong><span class="brand-location"><span class="brand-prefix">Almanac · </span>${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div><div class="header-actions"><a id="home">← Home</a><button id="settings" class="settings-open" type="button" aria-label="Almanac settings" aria-haspopup="dialog" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.9 7.9 0 0 0 0-2l2-1.5-2-3.5-2.3 1a8 8 0 0 0-1.7-1L15 3h-4l-.4 3a8 8 0 0 0-1.7 1L6.6 6l-2 3.5 2 1.5a7.9 7.9 0 0 0 0 2l-2 1.5 2 3.5 2.3-1a8 8 0 0 0 1.7 1l.4 3h4l.4-3a8 8 0 0 0 1.7-1l2.3 1 2-3.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg></button></div></div>
 <h1 id="head"></h1><p class="sub" id="sub"></p>
-</header><div class="view-tabs" role="tablist" aria-label="Almanac views"><button id="sky-tab" type="button" role="tab" aria-controls="sky-view" aria-selected="true">Sky</button><button id="lineup-tab" type="button" role="tab" aria-controls="lineup-view" aria-selected="false" tabindex="-1">Tonight’s Lineup</button></div>
+</header><div class="view-tabs" role="tablist" aria-label="Almanac views"><button id="sky-tab" type="button" role="tab" aria-controls="sky-view" aria-selected="true">Sky</button><button id="lineup-tab" type="button" role="tab" aria-controls="lineup-view" aria-selected="false" tabindex="-1">Tonight’s Lineup</button><button id="telemetry-tab" type="button" role="tab" aria-controls="telemetry-view" aria-selected="false" tabindex="-1">Sensor Telemetry</button></div>
 <div id="sky-view" role="tabpanel" aria-labelledby="sky-tab" style="display:contents"><section class="console-chart" aria-label="Daily sky chart"><div class="bar"><div class="key"><span>Sun</span><span class="m">Moon</span></div><div class="live" id="live"></div></div>
 <div class="chart" id="chart" tabindex="0" role="slider" aria-label="Time of day. Drag or use arrow keys to preview the sky; Escape returns to now."><div id="plot"></div></div>
 <div class="twilight-key"><span>Civil twilight</span><span>Nautical twilight</span><span>Astronomical twilight</span><span>Night</span><span>Moonless dark sky</span></div><p class="hint">Drag across the day to see the sky at any hour.</p></section>
 <div class="grid"><section class="p" id="sun"></section><section class="p" id="moon"></section><section class="p" id="map">${panelHeading('Where to look', 'ORBITAL / LOOK', 158)}<div id="map-readout"></div></section><section class="p" id="cycle"></section><span class="rail-footer">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div>
-</div><section class="p" id="lineup-view" role="tabpanel" aria-labelledby="lineup-tab" hidden></section>
+</div><section class="p" id="lineup-view" role="tabpanel" aria-labelledby="lineup-tab" hidden></section><section class="p" id="telemetry-view" role="tabpanel" aria-labelledby="telemetry-tab" hidden></section>
 </main><dialog id="settings-dialog" class="theme-dialog" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">Almanac settings</h2><button id="settings-close" class="settings-close" type="button">Done</button></div><p class="settings-note">Choose a theme. Saved for Almanac in this browser. Original follows daylight, sunset and night.</p><div class="theme-grid">${THEMES.map(([id, name, description, background, accent]) => `<button type="button" class="theme-choice" data-theme-choice="${id}" aria-pressed="false"><span class="theme-swatch" aria-hidden="true" style="background:linear-gradient(135deg,${background} 55%,${accent} 56%)"></span><span><strong>${name}</strong><small>${description}</small></span></button>`).join('')}</div><label class="planet-setting"><input type="checkbox" id="planet-toggle"> Show planets on the sky map</label></dialog></div>`;
     const $ = id => this.shadowRoot.getElementById(id);
     $('home').setAttribute('href', this.config.home_path || '/lovelace/0');
@@ -529,12 +560,12 @@ class AlmanacSky extends HTMLElement {
       try { localStorage.setItem('almanac.planets', String(this.showPlanets)); } catch (_) {}
       this.draw();
     });
-    const tabs = [$('sky-tab'), $('lineup-tab')];
-    this.showLineup = false;
+    const tabs = [$('sky-tab'), $('lineup-tab'), $('telemetry-tab')];
+    const panels = [$('sky-view'), $('lineup-view'), $('telemetry-view')];
+    this.activeView = 0;
     const selectTab = index => {
-      this.showLineup = index === 1;
-      $('sky-view').hidden = this.showLineup;
-      $('lineup-view').hidden = !this.showLineup;
+      this.activeView = index;
+      panels.forEach((panel, i) => { panel.hidden = i !== index; });
       tabs.forEach((tab, i) => {
         tab.setAttribute('aria-selected', String(i === index));
         tab.tabIndex = i === index ? 0 : -1;
@@ -546,7 +577,8 @@ class AlmanacSky extends HTMLElement {
       tab.addEventListener('keydown', event => {
         if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
         event.preventDefault();
-        const next = event.key === 'Home' ? 0 : event.key === 'End' ? 1 : 1 - index;
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+          : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
         selectTab(next);
         tabs[next].focus();
       });
@@ -639,7 +671,8 @@ class AlmanacSky extends HTMLElement {
     $('live').innerHTML = this.scrub == null ? (live ? 'Live' : 'Local calculations') : `Preview ${this.tm(T)} <button type="button">Back to now</button>`;
     $('chart').setAttribute('aria-valuetext', this.tm(T));
 
-    if (this.showLineup) this.renderLineup(T, D);
+    if (this.activeView === 1) this.renderLineup(T, D);
+    if (this.activeView === 2) this.renderTelemetry();
     this.plot(D, T, s, m);
 
     // sun
@@ -687,6 +720,61 @@ ${dot(s, sunUp, 'var(--sun)', 6)}${dot(m, moonUp, 'var(--moon)', 5)}${planetDots
 <p class="cap" style="margin:10px 0 0;text-align:center">Centre is straight overhead; the rim is the horizon. Dashed markers are below it.</p>`;
 
     if (this.cycleKey !== d0) { this.cycleKey = d0; this.cycle(now, d0); }
+  }
+
+  renderTelemetry() {
+    const panel = this.shadowRoot.getElementById('telemetry-view');
+    if (!panel) return;
+    const states = this._hass?.states || {};
+    const config = this.config.telemetry || {};
+    const weatherIds = Object.keys(states).filter(id => id.startsWith('weather.'));
+    const weatherId = config.weather_entity || (states['weather.forecast_home']
+      ? 'weather.forecast_home' : weatherIds.length === 1 ? weatherIds[0] : null);
+    const weather = states[weatherId];
+    const attrs = weather && !['unknown', 'unavailable'].includes(weather.state) ? weather.attributes : {};
+    const numeric = value => {
+      if (typeof value !== 'number' && (typeof value !== 'string' || !value.trim())) return null;
+      const number = Number(value);
+      return Number.isFinite(number) ? number : null;
+    };
+    const percentage = value => {
+      const number = numeric(value);
+      return number != null && number >= 0 && number <= 100 ? number : null;
+    };
+    const celsius = (value, unit) => {
+      const number = numeric(value);
+      if (number == null) return null;
+      if (unit === '°F') return (number - 32) * 5 / 9;
+      if (unit === 'K') return number - 273.15;
+      return unit === '°C' ? number : null;
+    };
+    const temperature = (entityId, attribute) => entityId
+      ? celsius(states[entityId]?.state, states[entityId]?.attributes?.unit_of_measurement)
+      : celsius(attrs[attribute], attrs.temperature_unit);
+    const temp = temperature(config.temperature_entity, 'temperature');
+    const dew = temperature(config.dew_point_entity, 'dew_point');
+    const spread = temp == null || dew == null ? null : temp - dew;
+    const warning = spread != null && spread <= 2 + 1e-8;
+    const formatTemp = value => value == null ? 'Unavailable' : `${value.toFixed(1)} °C`;
+    const percentageTile = (label, value) => `<div><dt>${label}</dt><dd>${value == null ? 'Unavailable' :
+      `${Math.round(value)}%<meter aria-label="${label}" min="0" max="100" value="${value}"></meter>`}</dd></div>`;
+    const seeing = states[config.seeing_entity];
+    const seeingArcseconds = ['″', '"', 'arcsec'].includes(seeing?.attributes?.unit_of_measurement);
+    const seeingValue = numeric(seeing?.state);
+    const seeingTile = seeingArcseconds && seeingValue >= 0 && seeingValue != null
+      ? `<div><dt>Seeing</dt><dd>${seeingValue.toFixed(1)} arcsec</dd></div>`
+      : percentageTile('Seeing', percentage(seeing?.state));
+    const html = `${panelHeading('Sensor Telemetry', 'SENSOR TELEMETRY', 190)}
+<dl class="telemetry-grid">
+${percentageTile('Cloud cover', percentage(config.cloud_cover_entity ? states[config.cloud_cover_entity]?.state : attrs.cloud_coverage))}
+${seeingTile}
+${percentageTile('Transparency', percentage(states[config.transparency_entity]?.state))}
+<div><dt>Temperature</dt><dd>${formatTemp(temp)}</dd></div>
+<div><dt>Dew point</dt><dd>${formatTemp(dew)}</dd></div>
+<div><dt>Temperature above dew point</dt><dd>${formatTemp(spread)}</dd></div>
+</dl>
+<p class="dew-status${warning ? ' warning' : ''}">${spread == null ? 'Dew risk unavailable' : warning ? 'Condensation warning' : 'Low dew risk'}</p>`;
+    if (panel.innerHTML !== html) panel.innerHTML = html;
   }
 
   renderLineup(time, today) {

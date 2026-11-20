@@ -155,6 +155,25 @@ Positions are calculated offline using [JPL’s approximate planetary elements](
 
 Open the **Tonight’s Lineup** tab for local rise, transit (peak altitude), set, apparent magnitude and estimated visibility for all four planets. The window runs from the middle of the current local day to the middle of the next, so events after midnight appear under their own date. A dash means that event does not occur in the window. Magnitude is approximate and uses [published planetary brightness models](https://arxiv.org/abs/1808.01973). Visibility uses the planet's altitude and a solar elevation below −6°, with evening or morning opportunities listed when applicable.
 
+## Sensor Telemetry
+
+Open **Sensor Telemetry** for current cloud cover, seeing, transparency, temperature and dew point. Almanac uses `weather.forecast_home` by default, or the sole weather entity if that ID is absent. Weather readings stay current while the sky timeline previews other times.
+
+Almanac shows a **Condensation warning** when the outdoor temperature is at or below 2°C above the dew point. Temperature sensors can report °C, °F or K. Cloud cover and transparency expect numeric percentages. Seeing accepts a numeric percentage or arcseconds. Missing readings appear as **Unavailable**.
+
+To choose your own sources, add the optional `telemetry` mapping in your Almanac card YAML. Keep only the entries you want to override.
+
+```yaml
+type: custom:almanac-sky-card
+telemetry:
+  weather_entity: weather.forecast_home
+  cloud_cover_entity: sensor.outdoor_cloud_cover
+  temperature_entity: sensor.outdoor_temperature
+  dew_point_entity: sensor.outdoor_dew_point
+  seeing_entity: sensor.astronomical_seeing
+  transparency_entity: sensor.sky_transparency
+```
+
 ## Tonight’s dark-sky window
 
 The timeline shades civil, nautical and astronomical twilight, then night. The mint strip marks times when the Sun is below −18° and the Moon is below Almanac’s apparent horizon (−0.833°). The chart shows intervals within its displayed local day.
@@ -267,6 +286,7 @@ type: custom:almanac-sky-card
 | Option | Default | Description |
 | --- | --- | --- |
 | `type` | Required | `custom:almanac-sky-card` |
+| `telemetry` | Automatic weather source | Optional entity overrides for Sensor Telemetry. |
 | `home_path` | `/lovelace/0` | Local dashboard path for the Home link. |
 
 The location and time zone come from Home Assistant's general settings. Dates and times follow your frontend locale; descriptive text is in English. Astronomical values are approximate.
