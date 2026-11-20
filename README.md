@@ -105,14 +105,14 @@ Deep navy panels, stars, and a glowing moon.
 
 Requires Home Assistant **2026.1.0 or newer** (Almanac v2.3.1 onward).
 
-1. Use the badge above, or add `https://github.com/yanke7/Home-Assistant-Almanac` as a custom repository with category **Integration**.
+1. Search for **Almanac** under **Settings → Marketplace** on Home Assistant 2026.11 or newer. On earlier supported versions, search in **HACS → Integrations**. You can also use the install badge above.
 2. Download Almanac. Restart Home Assistant if requested so it discovers the new integration.
 3. Go to **Settings → Devices & services → Add integration → Almanac** and confirm setup.
 4. Add **Almanac Sky** to a panel dashboard view using the YAML below. The card loads automatically; no separate card download or dashboard resource is needed.
 
 Almanac reads **Settings → System → General** for your home location and time zone. Changes are picked up within a minute. One Almanac entry is supported per Home Assistant instance.
 
-The repository can be installed by URL while catalog review is pending. The integration includes its logo for integration and Marketplace branding.
+Almanac is listed in the shared HACS and Home Assistant Marketplace catalog. If your local catalog hasn’t refreshed yet, you can add `https://github.com/yanke7/Home-Assistant-Almanac` as a custom repository under **Integration**.
 
 ## Themes and settings
 
