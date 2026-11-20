@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorEntityDescription, SensorStateClass
 
+from .astronomy import COMPASS_POINTS, PHASE_EVENTS, SOLAR_EVENTS
 from .entity import AlmanacEntity
 
 
@@ -13,6 +14,17 @@ def measurement(key, name, unit, device_class=None, precision=1):
 
 
 DESCRIPTIONS = (
+    measurement("daylight_percentage", "Daylight percentage", "%"),
+    measurement("solar_noon_elevation", "Solar noon elevation", "°"),
+    *(SensorEntityDescription(key=f"{body}_direction", name=f"{body.title()} direction",
+                              device_class=SensorDeviceClass.ENUM, options=COMPASS_POINTS)
+      for body in ("sun", "moon")),
+    *(SensorEntityDescription(key=f"today_{event}", name="Today " + event.replace("_", " "),
+                              device_class=SensorDeviceClass.TIMESTAMP)
+      for event in (*SOLAR_EVENTS, "moonrise", "moonset")),
+    *(SensorEntityDescription(key=f"next_{event}", name="Next " + event.replace("_", " "),
+                              device_class=SensorDeviceClass.TIMESTAMP)
+      for event in PHASE_EVENTS),
     measurement("sun_elevation", "Sun elevation", "°"),
     measurement("sun_azimuth", "Sun azimuth", "°"),
     measurement("moon_elevation", "Moon elevation", "°"),

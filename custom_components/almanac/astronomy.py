@@ -128,6 +128,34 @@ def day_data(date,lat,lon,tz):
             'noonAlt':sa[noon],'moonEv':crossings(times,ma,-0.833),'len':length}
 
 
+COMPASS_POINTS = "N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW".split()
+PHASE_EVENTS = ("new_moon", "first_quarter", "full_moon", "last_quarter")
+SOLAR_EVENTS = {
+    "sunrise": "rise", "sunset": "set", "dawn": "dawn", "dusk": "dusk",
+    "solar_noon": "noon", "evening_golden_hour": "golden",
+}
+
+
+@lru_cache(maxsize=4)
+def phase_events(midnight):
+    """Find upcoming quarter crossings using the card's hourly interpolation."""
+    hour = 3_600_000
+    start = midnight // hour * hour
+    previous = illumination(start)["phase"]
+    events = []
+    # Include a second occurrence when today's event has already passed.
+    for time in range(start + hour, start + 34 * DAY, hour):
+        phase = illumination(time)["phase"]
+        for index, name in enumerate(PHASE_EVENTS):
+            target = index / 4
+            before = (previous - target + 0.5) % 1 - 0.5
+            after = (phase - target + 0.5) % 1 - 0.5
+            if before < 0 <= after and after - before < 0.2:
+                events.append((name, time - hour - hour * before / (after - before)))
+        previous = phase
+    return tuple(events)
+
+
 def snapshot(now,latitude,longitude,time_zone):
     """Return sensors and the card's chart snapshot for one home location."""
     if now.tzinfo is None:
@@ -151,5 +179,23 @@ def snapshot(now,latitude,longitude,time_zone):
             'next_moonrise':lunar(True),'next_moonset':lunar(False)}
     for name,key in [('next_sunrise','rise'),('next_sunset','set'),('next_dawn','dawn'),('next_dusk','dusk'),('next_solar_noon','noon'),('next_golden_hour','golden')]:
         values[name]=upcoming(key)
+    values.update(
+        daylight_percentage=100 * today["len"] / (today["end"] - today["d0"]),
+        solar_noon_elevation=today["noonAlt"],
+        sun_direction=COMPASS_POINTS[int(s["az"] / 22.5 + 0.5) % 16],
+        moon_direction=COMPASS_POINTS[int(m["az"] / 22.5 + 0.5) % 16],
+        moon_waxing=il["phase"] < 0.5,
+    )
+    for name, key in SOLAR_EVENTS.items():
+        values[f"today_{name}"] = today[key]
+    for name, up in (("moonrise", True), ("moonset", False)):
+        values[f"today_{name}"] = next(
+            (event["t"] for event in today["moonEv"] if event["up"] == up), None
+        )
+    future_phases = phase_events(today["d0"])
+    for name in PHASE_EVENTS:
+        values[f"next_{name}"] = next(
+            (time for phase, time in future_phases if phase == name and time > t), None
+        )
     return {'now':t,'location':{'latitude':latitude,'longitude':longitude,'time_zone':time_zone},
             'sun':s,'moon':m,'illumination':il,'days':charts,'values':values}

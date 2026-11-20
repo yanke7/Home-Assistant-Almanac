@@ -59,6 +59,19 @@ class AstronomyTests(unittest.TestCase):
         self.assertTrue(0<=d['values']['moon_azimuth']<360)
         json.dumps(d,allow_nan=False)
 
+    def test_dashboard_events(self):
+        snap = self.snap()
+        values, today = snap["values"], snap["days"][1]
+        self.assertEqual(values["today_sunrise"], today["rise"])
+        self.assertLess(values["today_sunrise"], snap["now"])
+        self.assertAlmostEqual(values["daylight_percentage"], 100 * today["len"] / (today["end"] - today["d0"]))
+        full = values["next_full_moon"]
+        after = datetime.fromtimestamp(full / 1000 + 1, timezone.utc)
+        following = self.snap(after.isoformat())["values"]["next_full_moon"]
+        self.assertTrue(27 < (following - full) / 86400000 < 32)
+        for phase in ("new_moon", "first_quarter", "full_moon", "last_quarter"):
+            self.assertTrue(0 < values["next_" + phase] - snap["now"] < 32 * 86400000)
+
     def test_invalid_location(self):
         for lat,lon in [(91,0),(0,181),(float('nan'),0)]:
             with self.assertRaises(ValueError): self.snap(lat=lat,lon=lon)

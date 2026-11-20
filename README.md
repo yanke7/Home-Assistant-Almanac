@@ -83,13 +83,13 @@ Use the **Settings** gear beside Home on the Almanac card to choose a theme. The
 
 ## Sensors for automations
 
-All entities belong to the **Almanac** device. Names below use the default IDs; Home Assistant may add a suffix if an ID already exists.
+Find all **35 sensors and 3 binary sensors** under **Settings → Devices & services → Almanac → Devices → Almanac**. Use them as automation triggers or conditions. They update every minute with the dashboard closed. Dragging the chart previews another time only in that browser. Names below use the default IDs; Home Assistant may add a suffix if an ID already exists.
 
 | Entities | Values |
 | --- | --- |
 | `sensor.almanac_sun_elevation`, `sensor.almanac_sun_azimuth` | Degrees |
 | `sensor.almanac_moon_elevation`, `sensor.almanac_moon_azimuth` | Degrees |
-| `sensor.almanac_moon_phase`, `sensor.almanac_moon_illumination` | Phase name and illumination percentage |
+| `sensor.almanac_moon_phase`, `sensor.almanac_moon_illumination` | Phase state (listed below) and illumination percentage |
 | `sensor.almanac_moon_age`, `sensor.almanac_moon_distance` | Days and kilometres |
 | `sensor.almanac_daylight_duration`, `sensor.almanac_daylight_change` | Minutes of daylight; change in seconds since yesterday |
 | `sensor.almanac_sky_period` | `day`, `golden`, `twilight`, or `night` |
@@ -99,9 +99,84 @@ All entities belong to the **Almanac** device. Names below use the default IDs; 
 | `sensor.almanac_next_moonrise`, `sensor.almanac_next_moonset` | Upcoming timestamps |
 | `binary_sensor.almanac_sun_above_horizon`, `binary_sensor.almanac_moon_above_horizon` | Above the apparent horizon |
 
-Event sensors search the remainder of today and the following two local days. When no event occurs in that window (for example during polar night), the event is `unknown`. Daylight duration still reports zero or the full local-day length during polar night/day. Values are approximate and not intended for navigation. Sensor timestamps are stored in UTC and displayed in your Home Assistant time zone.
+| Additional dashboard entities (v2.3+) | Values |
+| --- | --- |
+| `sensor.almanac_sun_direction`, `sensor.almanac_moon_direction` | 16 compass points, clockwise from `N` through `NNE`, `NE`, … to `NNW` |
+| `sensor.almanac_daylight_percentage` | Percentage of the current local day spent above the solar horizon, accounting for daylight-saving changes |
+| `sensor.almanac_solar_noon_elevation` | Today's maximum sampled solar elevation in degrees |
+| `binary_sensor.almanac_moon_waxing` | `on` during the waxing half of the lunar cycle and `off` during the waning half |
+| `sensor.almanac_today_sunrise`, `sensor.almanac_today_sunset` | Today's sunrise and sunset |
+| `sensor.almanac_today_dawn`, `sensor.almanac_today_dusk` | Today's first and last civil light |
+| `sensor.almanac_today_solar_noon`, `sensor.almanac_today_evening_golden_hour` | Today's solar noon and evening descent through 6° |
+| `sensor.almanac_today_moonrise`, `sensor.almanac_today_moonset` | First rise and set on today's local date |
+| `sensor.almanac_next_new_moon`, `sensor.almanac_next_first_quarter`, `sensor.almanac_next_full_moon`, `sensor.almanac_next_last_quarter` | Upcoming phase timestamps from the lunar calendar |
+
+The **today** timestamps keep their value after the event until local midnight. An event that does not occur today is `unknown`. The **next** timestamps roll forward after the event. The moon phase states are `new_moon`, `waxing_crescent`, `first_quarter`, `waxing_gibbous`, `full_moon`, `waning_gibbous`, `last_quarter`, and `waning_crescent`.
+
+Upcoming sunrise, twilight, solar noon, golden hour and moonrise/set sensors search the remainder of today and the following two local days. When no event occurs in that window (for example during polar night), the event is `unknown`. Daylight duration still reports zero or the full local-day length during polar night/day. Values are approximate and not intended for navigation. Sensor timestamps are stored in UTC and displayed in your Home Assistant time zone.
 
 If the backend is temporarily unavailable, the card labels its browser-only fallback **Local calculations**. That fallback does not update sensor entities.
+
+## Example automations
+
+Each block is one automation. In **Settings → Automations & scenes**, create an empty automation, open **Edit in YAML**, and paste one example. Replace the example light with your own entity ID.
+
+### Turn on a porch light when evening twilight begins
+
+The transition from golden hour to twilight selects the evening crossing.
+
+```yaml
+alias: Almanac - Porch light at evening twilight
+triggers:
+  - trigger: state
+    entity_id: sensor.almanac_sky_period
+    from: "golden"
+    to: "twilight"
+actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.porch
+```
+
+### Notify when a bright moon rises
+
+This checks illumination at moonrise. The notification appears in Home Assistant.
+
+```yaml
+alias: Almanac - Bright moon rising
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.almanac_moon_above_horizon
+    from: "off"
+    to: "on"
+conditions:
+  - condition: numeric_state
+    entity_id: sensor.almanac_moon_illumination
+    above: 80
+actions:
+  - action: persistent_notification.create
+    data:
+      title: Bright moon rising
+      message: >-
+        Look {{ states('sensor.almanac_moon_direction') }}.
+        The moon is {{ states('sensor.almanac_moon_illumination') | float(0) | round(0) | int }}% illuminated.
+```
+
+### Schedule a reminder at the predicted full moon
+
+Use a time trigger to fire at the timestamp held by an event sensor.
+
+```yaml
+alias: Almanac - Full moon reminder
+triggers:
+  - trigger: time
+    at: sensor.almanac_next_full_moon
+actions:
+  - action: persistent_notification.create
+    data:
+      title: Full moon
+      message: The moon has reached its predicted full phase.
+```
 
 ## Configure
 
