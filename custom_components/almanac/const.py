@@ -1,4 +1,4 @@
 """Almanac constants."""
 DOMAIN = "almanac"
-VERSION = "2.7.0"
+VERSION = "2.8.0"
 CARD_URL = f"/almanac/almanac-sky-card.js?v={VERSION}"

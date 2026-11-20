@@ -9,6 +9,7 @@ from homeassistant.helpers import config_validation as cv
 
 from .const import CARD_URL, DOMAIN
 from .coordinator import AlmanacCoordinator
+from .space_weather import SpaceWeather
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR]
@@ -31,12 +32,21 @@ async def websocket_snapshot(hass, connection, msg):
     connection.send_result(msg["id"], result)
 
 
+@websocket_api.websocket_command({vol.Required("type"): "almanac/space_weather"})
+@websocket_api.async_response
+async def websocket_space_weather(hass, connection, msg):
+    """Return NOAA observations and local aurora potential."""
+    connection.send_result(msg["id"], await hass.data["almanac_space_weather"].snapshot())
+
+
 async def async_setup(hass, config):
     """Register the local card and authenticated WebSocket command once."""
     await hass.http.async_register_static_paths([
         StaticPathConfig("/almanac/almanac-sky-card.js",
                          str(Path(__file__).parent / "www" / "almanac-sky-card.js"), False)
     ])
+    hass.data["almanac_space_weather"] = SpaceWeather(hass)
+    websocket_api.async_register_command(hass, websocket_space_weather)
     websocket_api.async_register_command(hass, websocket_snapshot)
     return True
 
