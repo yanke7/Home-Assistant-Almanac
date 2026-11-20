@@ -196,6 +196,27 @@ h1{font-size:calc(clamp(22px,2.3vw,34px) * var(--text-scale));max-width:none;mar
 .shell[data-theme=trek] .lab{display:flex;gap:6px;align-items:center;color:var(--gold);font-size:clamp(13px,1.3vw,22px);font-weight:850;letter-spacing:.02em;line-height:1;background:#030303;margin:0 0 12px;width:fit-content;padding:0 5px}
 .shell[data-theme=trek] .stats dt,.shell[data-theme=trek] .next li span{background:var(--rail);border-radius:12px;color:#100e09;padding:2px 7px;font-weight:700}
 .shell[data-theme=trek] .p:nth-child(even) .next li:nth-child(even) span{background:var(--lilac)}
+.shell[data-theme=trek] .p .lab{width:auto;padding:0;margin:0 0 10px;font-weight:750;font-stretch:condensed}
+.shell[data-theme=trek] .p .lab::after{content:"";flex:1;min-width:12px;height:.8em;border-radius:0 1em 1em 0;background:linear-gradient(90deg,var(--rail) 0 calc(100% - 12px),#030303 0 calc(100% - 9px),var(--rail) 0)}
+.shell[data-theme=trek] #sun .big,.shell[data-theme=trek] #sun>.cap{display:inline-block;vertical-align:middle}
+.shell[data-theme=trek] #sun .big{font-weight:700;font-size:clamp(32px,3vw,54px);border-left:5px solid var(--orange);padding-left:6px}
+.shell[data-theme=trek] #sun>.cap{max-width:9em;margin:3px 0 3px 7px;color:var(--orange);font-weight:700;text-transform:uppercase}
+.shell[data-theme=trek] .stats{border-top:3px solid var(--rail);padding-top:7px;margin-top:8px}
+.shell[data-theme=trek] #sun .stats{grid-template-columns:1fr;gap:3px}
+.shell[data-theme=trek] #sun .stats div{display:grid;grid-template-columns:46% 1fr;align-items:center;gap:6px}
+.shell[data-theme=trek] #sun .stats dt{margin:0}
+.shell[data-theme=trek] #sun .stats div:nth-child(even) dt{background:var(--orange)}
+.shell[data-theme=trek] #moon .moonrow{gap:8px;min-height:70px;border-right:5px solid var(--orange);padding-right:5px}
+.shell[data-theme=trek] #moon .moonrow svg{width:clamp(50px,4.7vw,80px);height:auto}
+.shell[data-theme=trek] #moon .stats{gap:7px}
+.shell[data-theme=trek] #moon .stats div{border-inline:3px solid var(--orange);border-radius:5px;padding:2px 5px}
+.shell[data-theme=trek] #moon .stats dt{background:none;color:var(--mute);padding:0}
+.shell[data-theme=trek] #map .map{max-width:255px;--line:#9c794d;background:radial-gradient(circle,#e9bc4326,transparent 57%)}
+.shell[data-theme=trek] #map .cap{display:block;font-size:12px}
+.shell[data-theme=trek] .next li{gap:4px;margin:3px 0;padding:0}
+.shell[data-theme=trek] .next small{background:var(--lilac);color:#110f14;border-radius:12px;padding:2px 5px}
+.shell[data-theme=trek] .next li:nth-child(even) small{background:var(--gold)}
+.shell[data-theme=trek] .cal{border-top:3px solid var(--lilac);padding-top:5px}
 @container(max-width:640px){
  .shell[data-theme=trek] .console-header{padding-left:0;border-right-width:9px}
  .shell[data-theme=trek] .top{padding-left:76px;min-height:74px}
@@ -407,20 +428,20 @@ class AlmanacSky extends HTMLElement {
     const ds = diff == null ? '—' : `${diff < 0 ? '−' : '+'}${Math.floor(Math.abs(diff) / 6e4)} m ${Math.round(Math.abs(diff) % 6e4 / 1e3)} s`;
     const st = (k, v, x) => `<div><dt>${k}</dt><dd>${v}${x ? ` <small>${x}</small>` : ''}</dd></div>`;
     const deg = v => `${v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}°`;
-    $('sun').innerHTML = `<p class="lab">Sun</p><div class="big s">${deg(s.alt)}</div>
+    $('sun').innerHTML = `<p class="lab">${this.theme === 'trek' ? 'Solar metrics' : 'Sun'}</p><div class="big s">${deg(s.alt)}</div>
 <p class="cap">${sunUp ? 'above' : 'below'} the horizon · ${P16[Math.round(s.az / 22.5) % 16]} ${Math.round(s.az)}°</p>
 <dl class="stats">${st('Sunrise', this.tm(D.rise))}${st('Sunset', this.tm(D.set))}${st('First light', this.tm(D.dawn))}${st('Last light', this.tm(D.dusk))}${st('Solar noon', this.tm(D.noon), `${D.noonAlt.toFixed(0)}° high`)}${st('Golden hour', this.tm(D.golden))}${st('Daylight', D.len == null ? '—' : this.dur(D.len))}${st('Since yesterday', ds)}</dl>`;
 
     // moon
     const rot = -((il.ang - m.pa) / R) - 90;
-    $('moon').innerHTML = `<p class="lab">Moon</p><div class="moonrow">${moonSvg(118, il.f, rot, true)}<div><div class="name">${name}</div><p class="cap">${pct}% lit · ${il.phase < 0.5 ? 'waxing' : 'waning'}</p></div></div>
+    $('moon').innerHTML = `<p class="lab">${this.theme === 'trek' ? 'Lunar telemetry' : 'Moon'}</p><div class="moonrow">${moonSvg(118, il.f, rot, true)}<div><div class="name">${name}</div><p class="cap">${pct}% lit · ${il.phase < 0.5 ? 'waxing' : 'waning'}</p></div></div>
 <dl class="stats">${st('Altitude', deg(m.alt), moonUp ? 'up' : 'down')}${st('Direction', `${P16[Math.round(m.az / 22.5) % 16]} ${Math.round(m.az)}°`)}${moonUp && mRose ? st('Rose', this.tm(mRose), mRose < d0 ? 'yesterday' : '') : st('Rises', this.tm(mRise), mRise ? this.dayTag(mRise, d0) : '')}${st('Sets', this.tm(mSet), mSet ? this.dayTag(mSet, d0) : '')}${st('Age', `${(il.phase * 29.53).toFixed(1)} days`)}${st('Distance', `${Math.round(m.dist / 100) * 100 >= 1e3 ? (Math.round(m.dist / 100) * 100).toLocaleString('en-US') : m.dist} km`)}</dl>`;
 
     // sky map
     const pt = (alt, az, r = 100) => { const q = (90 - Math.max(0, alt)) / 90 * r; return [q * Math.sin(az * R), -q * Math.cos(az * R)]; };
     const arc = (al, az) => { let d = '', pen = false; for (let i = 0; i < al.length; i += 3) { if (al[i] > 0) { const [x, y] = pt(al[i], az[i]); d += `${pen ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`; pen = true; } else pen = false; } return d; };
     const dot = (p, up, col, r) => { const [x, y] = pt(p.alt, p.az); return up ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r + 5}" fill="${col}" opacity=".22"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${col}"/>` : `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="none" stroke="${col}" stroke-width="1.5" stroke-dasharray="2.5 2.5"/>`; };
-    $('map').innerHTML = `<p class="lab">Where to look</p><svg class="map" viewBox="-128 -128 256 256" role="img" aria-label="Sky map: sun ${sunUp ? 'up' : 'down'} toward ${P16[Math.round(s.az / 22.5) % 16]}, moon ${moonUp ? 'up' : 'down'} toward ${P16[Math.round(m.az / 22.5) % 16]}">
+    $('map').innerHTML = `<p class="lab">${this.theme === 'trek' ? 'Orbital / Look' : 'Where to look'}</p><svg class="map" viewBox="-128 -128 256 256" role="img" aria-label="Sky map: sun ${sunUp ? 'up' : 'down'} toward ${P16[Math.round(s.az / 22.5) % 16]}, moon ${moonUp ? 'up' : 'down'} toward ${P16[Math.round(m.az / 22.5) % 16]}">
 <circle r="100" fill="none" stroke="var(--ink)" stroke-opacity=".45"/><circle r="66.7" fill="none" stroke="var(--line)"/><circle r="33.3" fill="none" stroke="var(--line)"/><path d="M-100,0H100M0,-100V100" stroke="var(--line)"/>
 <text y="-108" text-anchor="middle">N</text><text y="119" text-anchor="middle">S</text><text x="112" y="4" text-anchor="middle">E</text><text x="-112" y="4" text-anchor="middle">W</text>
 <path d="${arc(D.sa, D.sz)}" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round"/><path d="${arc(D.ma, D.mz)}" fill="none" stroke="var(--moon)" stroke-width="2" stroke-linecap="round"/>
