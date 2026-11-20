@@ -179,16 +179,21 @@ h1{font-size:calc(clamp(22px,2.3vw,34px) * var(--text-scale));max-width:none;mar
 .shell[data-theme=trek] .trek-title{display:block;color:var(--gold);font-size:clamp(19px,2.3vw,38px);font-weight:900;line-height:1}
 .shell[data-theme=trek] h1{text-align:right;max-width:none;font-size:clamp(23px,3vw,55px);line-height:1;font-weight:850}
 .shell[data-theme=trek] .sub{text-align:right;margin:4px 0 0}
-.shell[data-theme=trek] .console-chart,.shell[data-theme=trek] .p{--rail:var(--orange);position:relative;display:block;background:#030303;border:0;border-top:12px solid var(--rail);border-radius:32px 8px 0 22px;padding:6px 6px 8px clamp(26px,4vw,64px)}
-.shell[data-theme=trek] :is(.console-chart,.p)::before{content:"";position:absolute;inset:0 auto 0 0;width:clamp(16px,3vw,47px);border-radius:0 0 0 22px;background:linear-gradient(to bottom,var(--rail) 0 24%,#000 24% 26%,var(--lilac) 26% 73%,#000 73% 75%,var(--rail) 75%)}
-.shell[data-theme=trek] .console-chart{display:flex;flex-direction:column;flex:1 0 auto;border-bottom:2px solid var(--gold)}
+.shell[data-theme=trek] .console-chart,.shell[data-theme=trek] .p{
+ --rail:var(--orange);--rail-width:clamp(16px,3vw,47px);
+ display:block;border:solid transparent;border-width:12px 0 2px var(--rail-width);
+ border-radius:calc(var(--rail-width) + 14px) 10px 4px calc(var(--rail-width) + 10px);
+ background:linear-gradient(#030303,#030303) padding-box,
+   linear-gradient(to bottom,var(--rail) 24%,#030303 24% 26%,var(--lilac) 26% 73%,#030303 73% 75%,var(--rail) 75%) border-box;
+ padding:8px 7px 9px 12px;
+}
+.shell[data-theme=trek] .console-chart{display:flex;flex-direction:column;flex:1 0 auto}
 .shell[data-theme=trek] .chart{min-height:175px}
 .shell[data-theme=trek] .grid{gap:12px;margin-top:4px;border-bottom:10px solid var(--gold);padding-bottom:6px}
-.shell[data-theme=trek] .p{--rail:var(--gold);border-top-width:8px;padding-left:clamp(18px,2vw,32px)}
-.shell[data-theme=trek] .p::before{width:clamp(10px,1.5vw,24px)}
+.shell[data-theme=trek] .p{--rail:var(--gold);--rail-width:clamp(10px,1.5vw,24px);border-top-width:8px}
 .shell[data-theme=trek] #moon{--rail:var(--lilac)}
 .shell[data-theme=trek] #cycle{--rail:var(--orange)}
-.shell[data-theme=trek] .lab{display:flex;gap:6px;align-items:center;color:var(--gold);font-size:clamp(13px,1.3vw,22px);font-weight:850;letter-spacing:.02em;line-height:1;background:#030303;margin:-12px 0 12px;width:fit-content;padding:0 5px}
+.shell[data-theme=trek] .lab{display:flex;gap:6px;align-items:center;color:var(--gold);font-size:clamp(13px,1.3vw,22px);font-weight:850;letter-spacing:.02em;line-height:1;background:#030303;margin:0 0 12px;width:fit-content;padding:0 5px}
 .shell[data-theme=trek] .stats dt,.shell[data-theme=trek] .next li span{background:var(--rail);border-radius:12px;color:#100e09;padding:2px 7px;font-weight:700}
 .shell[data-theme=trek] .p:nth-child(even) .next li:nth-child(even) span{background:var(--lilac)}
 @container(max-width:640px){
@@ -292,7 +297,7 @@ class AlmanacSky extends HTMLElement {
     const ns = this.lat >= 0 ? 'N' : 'S', ew = this.lon >= 0 ? 'E' : 'W';
     this.releaseAppearance();
     this.shadowRoot.innerHTML = `<style>${CSS}</style><div id="shell" class="shell" data-sky="night"><div class="stars">${stars}</div><main>
-<header class="console-header"><div class="top"><div class="brand"><img id="brand-logo" class="brand-logo" src="${LOGO}" alt="Almanac sun and moon logo" width="64" height="64"><strong class="trek-title">Almanac sensors</strong><span class="brand-location">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div><div class="header-actions"><a id="home">← Home</a><button id="settings" class="settings-open" type="button" aria-label="Almanac settings" aria-haspopup="dialog" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.9 7.9 0 0 0 0-2l2-1.5-2-3.5-2.3 1a8 8 0 0 0-1.7-1L15 3h-4l-.4 3a8 8 0 0 0-1.7 1L6.6 6l-2 3.5 2 1.5a7.9 7.9 0 0 0 0 2l-2 1.5 2 3.5 2.3-1a8 8 0 0 0 1.7 1l.4 3h4l.4-3a8 8 0 0 0 1.7-1l2.3 1 2-3.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg></button></div></div>
+<header class="console-header"><div class="top"><div class="brand"><img id="brand-logo" class="brand-logo" src="${LOGO}" alt="Almanac sun and moon logo" width="64" height="64"><strong class="trek-title">Almanac</strong><span class="brand-location">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div><div class="header-actions"><a id="home">← Home</a><button id="settings" class="settings-open" type="button" aria-label="Almanac settings" aria-haspopup="dialog" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.9 7.9 0 0 0 0-2l2-1.5-2-3.5-2.3 1a8 8 0 0 0-1.7-1L15 3h-4l-.4 3a8 8 0 0 0-1.7 1L6.6 6l-2 3.5 2 1.5a7.9 7.9 0 0 0 0 2l-2 1.5 2 3.5 2.3-1a8 8 0 0 0 1.7 1l.4 3h4l.4-3a8 8 0 0 0 1.7-1l2.3 1 2-3.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg></button></div></div>
 <h1 id="head"></h1><p class="sub" id="sub"></p>
 </header><section class="console-chart" aria-label="Daily sky chart"><div class="bar"><div class="key"><span>Sun</span><span class="m">Moon</span></div><div class="live" id="live"></div></div>
 <div class="chart" id="chart" tabindex="0" role="slider" aria-label="Time of day. Drag or use arrow keys to preview the sky; Escape returns to now."><div id="plot"></div></div>
