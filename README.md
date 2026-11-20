@@ -17,7 +17,7 @@ A local sun and moon integration for Home Assistant, with continuously updated s
 
 ## Theme gallery
 
-Choose a theme with the gear on the card. These previews show the same sunset in Saskatoon so you can compare palettes. Select an image to see it full size.
+Choose a theme with the gear on the card. These Almanac v2.10.1 screenshots show the same sunset in Saskatoon so you can compare palettes. The preview uses local calculations. Select an image to see it full size.
 
 ### Star Trek
 
