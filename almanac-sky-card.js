@@ -34,6 +34,25 @@ function phaseName(p) {
 const P16 = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
 const P8 = ['northern', 'north-eastern', 'eastern', 'south-eastern', 'southern', 'south-western', 'western', 'north-western'];
 const SKY = [[-18, [8, 12, 30]], [-12, [24, 32, 78]], [-6, [82, 66, 128]], [-1, [226, 128, 92]], [4, [245, 190, 120]], [12, [122, 178, 236]], [90, [96, 160, 232]]];
+function skyBands(times, sun, moon, cross) {
+  const limits = [-0.833, -6, -12, -18];
+  const events = [
+    ...limits.flatMap(limit => cross(sun, limit)),
+    ...cross(moon, -0.833).map(event => ({ ...event, lunar: true })),
+  ].sort((a, b) => a.t - b.t);
+  let level = limits.filter(limit => sun[0] < limit).length;
+  let moonDown = moon[0] < -0.833;
+  let start = times[0];
+  const bands = [];
+  for (const event of [...events, { t: times.at(-1) }]) {
+    if (event.t > start) bands.push([start, event.t, level, level === 4 && moonDown]);
+    if (event.lunar) moonDown = !event.up;
+    else level += event.up ? -1 : 1;
+    start = event.t;
+  }
+  return bands;
+}
+
 function skyColor(a) {
   if (a <= SKY[0][0]) return `rgb(${SKY[0][1]})`;
   for (let i = 1; i < SKY.length; i++) if (a <= SKY[i][0]) { const [a0, c0] = SKY[i - 1], [a1, c1] = SKY[i], k = (a - a0) / (a1 - a0); return `rgb(${c0.map((v, j) => Math.round(v + (c1[j] - v) * k))})`; }
@@ -147,6 +166,13 @@ button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--in
 .chart{position:relative;touch-action:pan-y;cursor:ew-resize;user-select:none;-webkit-user-select:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .chart svg{display:block;width:100%}
 .chart text{font-family:var(--sans);font-size:calc(11px * var(--text-scale));fill:var(--mute)}
+.twilight-key{display:flex;flex-wrap:wrap;gap:3px 12px;margin:4px 0;font-size:11px;color:var(--mute)}
+.twilight-key span::before{content:"";display:inline-block;width:9px;height:9px;margin-inline-end:4px;border:1px solid var(--line);background:var(--swatch)}
+.twilight-key span:nth-child(1){--swatch:#5f78ac}
+.twilight-key span:nth-child(2){--swatch:#394c80}
+.twilight-key span:nth-child(3){--swatch:#222c54}
+.twilight-key span:nth-child(4){--swatch:#030617}
+.twilight-key span:nth-child(5){--swatch:#60e6c4}
 .hint{font-size:calc(11px * var(--text-scale));color:var(--mute);margin:8px 0 0}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:clamp(16px,2vw,26px)}
 .p{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px 20px 18px;min-width:0}
@@ -375,7 +401,7 @@ class AlmanacSky extends HTMLElement {
 <h1 id="head"></h1><p class="sub" id="sub"></p>
 </header><section class="console-chart" aria-label="Daily sky chart"><div class="bar"><div class="key"><span>Sun</span><span class="m">Moon</span></div><div class="live" id="live"></div></div>
 <div class="chart" id="chart" tabindex="0" role="slider" aria-label="Time of day. Drag or use arrow keys to preview the sky; Escape returns to now."><div id="plot"></div></div>
-<p class="hint">Drag across the day to see the sky at any hour.</p></section>
+<div class="twilight-key"><span>Civil twilight</span><span>Nautical twilight</span><span>Astronomical twilight</span><span>Night</span><span>Moonless dark sky</span></div><p class="hint">Drag across the day to see the sky at any hour.</p></section>
 <div class="grid"><section class="p" id="sun"></section><section class="p" id="moon"></section><section class="p" id="map"></section><section class="p" id="cycle"></section><span class="rail-footer">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div>
 </main><dialog id="settings-dialog" class="theme-dialog" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">Almanac settings</h2><button id="settings-close" class="settings-close" type="button">Done</button></div><p class="settings-note">Choose a theme. Saved for Almanac in this browser. Original follows daylight, sunset and night.</p><div class="theme-grid">${THEMES.map(([id, name, description, background, accent]) => `<button type="button" class="theme-choice" data-theme-choice="${id}" aria-pressed="false"><span class="theme-swatch" aria-hidden="true" style="background:linear-gradient(135deg,${background} 55%,${accent} 56%)"></span><span><strong>${name}</strong><small>${description}</small></span></button>`).join('')}</div></dialog></div>`;
     const $ = id => this.shadowRoot.getElementById(id);
@@ -439,6 +465,7 @@ class AlmanacSky extends HTMLElement {
     }
     if (since != null) length += end - since;
     d.len = length;
+    d.skyBands = skyBands(t, sa, ma, cross);
     if (this.cache.size > 6) this.cache.delete(this.cache.keys().next().value);
     this.cache.set(d0, d); return d;
   }
@@ -510,6 +537,14 @@ ${dot(s, sunUp, 'var(--sun)', 6)}${dot(m, moonUp, 'var(--moon)', 5)}</svg>
     const max = Math.max(20, ...D.sa, ...D.ma) + 8, min = -max * 0.55;
     const x = t => (t - d0) / (D.end - d0) * W, y = a => top + (max - Math.max(min, Math.min(max, a))) / (max - min) * (bot - top), y0 = y(0);
     const path = a => { let d = ''; for (let i = 0; i < a.length; i = i === a.length - 1 ? a.length : Math.min(i + 5, a.length - 1)) d += `${i ? 'L' : 'M'}${x(D.t[i]).toFixed(1)},${(top + (max - a[i]) / (max - min) * (bot - top)).toFixed(1)}`; return d; };
+    const bandColours = ['transparent', '#5f78ac', '#394c80', '#222c54', '#030617'];
+    const bands = (D.skyBands || []).map(([start, end, level, moonless]) => {
+      const left = x(start).toFixed(2);
+      const width = (x(end) - x(start)).toFixed(2);
+      const shade = `<rect x="${left}" y="${top}" width="${width}" height="${bot - top}" fill="${bandColours[level]}" opacity="${level === 4 ? .78 : .42}"/>`;
+      const highlight = moonless ? `<rect x="${left}" y="${bot - 4}" width="${width}" height="4" fill="#60e6c4"/>` : '';
+      return shade + highlight;
+    }).join('');
     const ps = path(D.sa), pm = path(D.ma);
     let stops = ''; for (let i = 0; i <= 48; i++) stops += `<stop offset="${(i / 48 * 100).toFixed(2)}%" stop-color="${skyColor(D.sa[Math.round(i / 48 * (D.sa.length - 1))])}"/>`;
     let ticks = ''; const every = W < 600 ? 6 : 3;
@@ -520,7 +555,7 @@ ${dot(s, sunUp, 'var(--sun)', 6)}${dot(m, moonUp, 'var(--moon)', 5)}</svg>
     this.shadowRoot.getElementById('plot').innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">
 <defs><linearGradient id="ribbon">${stops}</linearGradient><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".55"/></linearGradient><mask id="fm"><rect width="${W}" height="${y0}" fill="url(#fade)"/></mask>
 <clipPath id="up"><rect width="${W}" height="${y0}"/></clipPath><clipPath id="dn"><rect y="${y0}" width="${W}" height="${bot - y0}"/></clipPath></defs>
-<rect width="${W}" height="${y0}" fill="url(#ribbon)" mask="url(#fm)" opacity=".38"/>${ticks}
+${bands}<rect width="${W}" height="${y0}" fill="url(#ribbon)" mask="url(#fm)" opacity=".38"/>${ticks}
 <g clip-path="url(#dn)" fill="none" stroke-width="1.5" stroke-dasharray="3 5" opacity=".55"><path d="${pm}" stroke="var(--moon)"/><path d="${ps}" stroke="var(--sun)"/></g>
 <g clip-path="url(#up)"><path d="${pm}V${y0}H0Z" fill="var(--moon)" opacity=".1"/><path d="${ps}V${y0}H0Z" fill="var(--sun)" opacity=".16"/><path d="${pm}" fill="none" stroke="var(--moon)" stroke-width="2.5"/><path d="${ps}" fill="none" stroke="var(--sun)" stroke-width="3"/></g>
 <rect y="${y0 - 3}" width="${W}" height="6" rx="3" fill="url(#ribbon)"/>

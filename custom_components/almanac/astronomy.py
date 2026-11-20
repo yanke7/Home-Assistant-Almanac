@@ -104,6 +104,43 @@ def crossings(times,values,threshold):
     return result
 
 
+def sky_bands(times, sun, moon):
+    """Split a local day at twilight and lunar horizon crossings."""
+    solar_limits = (-0.833, -6, -12, -18)
+    events = sorted(
+        [(event["t"], False, event["up"]) for limit in solar_limits
+         for event in crossings(times, sun, limit)]
+        + [(event["t"], True, event["up"]) for event in crossings(times, moon, -0.833)]
+    )
+    level = sum(sun[0] < limit for limit in solar_limits)
+    moon_down = moon[0] < -0.833
+    start = times[0]
+    bands = []
+    for end, lunar, up in [*events, (times[-1], False, False)]:
+        if end > start:
+            bands.append((start, end, level, level == 4 and moon_down))
+        if lunar:
+            moon_down = not up
+        else:
+            level += -1 if up else 1
+        start = end
+    return bands
+
+
+def dark_sky_windows(charts):
+    """Join adjacent moonless astronomical darkness across local midnight."""
+    windows = []
+    for day in charts:
+        for start, end, _, moonless in day["skyBands"]:
+            if not moonless:
+                continue
+            if windows and windows[-1][1] == start:
+                windows[-1][1] = end
+            else:
+                windows.append([start, end])
+    return windows
+
+
 @lru_cache(maxsize=16)
 def day_data(date,lat,lon,tz):
     d0=start_of_date(date,tz);end=start_of_date(date+timedelta(days=1),tz)
@@ -125,7 +162,7 @@ def day_data(date,lat,lon,tz):
             'rise':first(h,True),'set':first(list(reversed(h)),False),
             'dawn':first(c,True),'dusk':first(list(reversed(c)),False),
             'golden':first(list(reversed(g)),False),'noon':times[noon],
-            'noonAlt':sa[noon],'moonEv':crossings(times,ma,-0.833),'len':length}
+            'skyBands':sky_bands(times,sa,ma),'noonAlt':sa[noon],'moonEv':crossings(times,ma,-0.833),'len':length}
 
 
 COMPASS_POINTS = "N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW".split()
@@ -197,5 +234,10 @@ def snapshot(now,latitude,longitude,time_zone):
         values[f"next_{name}"] = next(
             (time for phase, time in future_phases if phase == name and time > t), None
         )
+    start, end = next(((a, b) for a, b in dark_sky_windows(charts) if b > t), (None, None))
+    # A window that touches a search boundary may extend beyond it.
+    values["dark_sky_window_start"] = None if start == charts[0]["d0"] else start
+    values["dark_sky_window_end"] = None if end == charts[-1]["end"] else end
+    values["moonless_dark_sky"] = s["alt"] < -18 and m["alt"] < -0.833
     return {'now':t,'location':{'latitude':latitude,'longitude':longitude,'time_zone':time_zone},
             'sun':s,'moon':m,'illumination':il,'days':charts,'values':values}

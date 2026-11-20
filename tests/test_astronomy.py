@@ -72,6 +72,15 @@ class AstronomyTests(unittest.TestCase):
         for phase in ("new_moon", "first_quarter", "full_moon", "last_quarter"):
             self.assertTrue(0 < values["next_" + phase] - snap["now"] < 32 * 86400000)
 
+    def test_twilight_bands_and_midnight_join(self):
+        bands = astro.sky_bands([0, 200], [-1, -21], [-1, -1])
+        self.assertEqual([band[2] for band in bands], [1, 2, 3, 4])
+        self.assertEqual(bands[-1], (170, 200, 4, True))
+        next_day = astro.sky_bands([200, 400], [-21, -21], [-2, 0.334])
+        self.assertEqual(astro.dark_sky_windows(
+            [{"skyBands": bands}, {"skyBands": next_day}])[0][0], 170)
+        self.assertAlmostEqual(next_day[0][1], 300)
+
     def test_invalid_location(self):
         for lat,lon in [(91,0),(0,181),(float('nan'),0)]:
             with self.assertRaises(ValueError): self.snap(lat=lat,lon=lon)
