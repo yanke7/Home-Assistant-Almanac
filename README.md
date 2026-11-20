@@ -9,6 +9,12 @@ A local sun and moon integration for Home Assistant, with continuously updated s
 [![Open in HACS or Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=yanke7&repository=Home-Assistant-Almanac&category=integration)
 
 
+## Watch Almanac in 30 seconds
+
+[![A 30-second preview of Almanac’s sky dashboard, Home Assistant automations, themes and languages](assets/video/almanac-overview.gif)](https://github.com/yanke7/Home-Assistant-Almanac/releases/download/v2.10.1/almanac-overview-1080p.mp4)
+
+[Open the 1080p video with sound](https://github.com/yanke7/Home-Assistant-Almanac/releases/download/v2.10.1/almanac-overview-1080p.mp4)
+
 ## Theme gallery
 
 Choose a theme with the gear on the card. These previews show the same sunset in Saskatoon so you can compare palettes. Select an image to see it full size.
