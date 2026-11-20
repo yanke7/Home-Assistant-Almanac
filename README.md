@@ -174,6 +174,14 @@ telemetry:
   transparency_entity: sensor.sky_transparency
 ```
 
+## Subspace / Solar Weather
+
+Open the **Subspace / Solar Weather** tab for NOAA Space Weather Prediction Center readings. It shows estimated planetary Kp, solar wind speed in km/s, and the northward or southward Bz component in nT (GSM). Each reading shows its observation time in your local time zone.
+
+Almanac shows **Possible aurora near you** when NOAA’s OVATION forecast reaches an index of 20 within 500 km of your Home Assistant location and the Sun is below −6° at the forecast time (or now if the forecast time has just passed). This is an estimate based on nearby auroral activity and darkness. Clouds, light pollution, and your horizon affect what you can see. The local index is the value at the nearest forecast grid cell.
+
+The tab needs internet access from Home Assistant. It refreshes on demand while open, shares a five-minute NOAA cache across clients, and marks expired observations as unavailable. The core Almanac calculations run locally. [NOAA aurora forecast](https://www.swpc.noaa.gov/products/aurora-30-minute-forecast)
+
 ## Tonight’s dark-sky window
 
 The timeline shades civil, nautical and astronomical twilight, then night. The mint strip marks times when the Sun is below −18° and the Moon is below Almanac’s apparent horizon (−0.833°). The chart shows intervals within its displayed local day.
