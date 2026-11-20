@@ -1,10 +1,10 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-function load(storage) {
+function load(storage, window = {}) {
   let Card;
   vm.runInNewContext(fs.readFileSync('almanac-sky-card.js', 'utf8'), {
-    window: {}, localStorage: storage, HTMLElement: class { attachShadow() {} },
+    window, localStorage: storage, HTMLElement: class { attachShadow() {} },
     customElements: { get() {}, define(name, value) { Card = value; } },
   });
   return Card;
@@ -35,4 +35,31 @@ const privateCard = new PrivateCard();
 privateCard.shadowRoot = card.shadowRoot; privateCard.draw = () => {};
 privateCard.chooseTheme('neon');
 assert.equal(privateCard.theme, 'neon', 'theme switching works when storage is unavailable');
+const sharedWindow = {};
+const SharedCard = load({ getItem: () => 'appearance' }, sharedWindow);
+const sharedCard = new SharedCard();
+sharedCard.shadowRoot = card.shadowRoot;
+sharedCard._hass = { states: {} };
+sharedCard.isConnected = true;
+sharedCard.draw = () => {};
+sharedCard.syncAppearance(); // The optional Appearance resource can load later.
+let applied = 0;
+let released = 0;
+sharedWindow.YankeAppearance = {
+  apply(target, hass) {
+    assert.equal(target, shell);
+    assert.equal(hass, sharedCard._hass);
+    applied++;
+  },
+  releaseViewport(target) {
+    assert.equal(target, shell);
+    released++;
+  },
+};
+sharedCard.appearanceReady();
+assert.equal(applied, 1);
+sharedCard.chooseTheme('original');
+assert.equal(released, 1);
+sharedCard.appearanceReady();
+assert.equal(applied, 1, 'other themes ignore shared preference changes');
 console.log('Theme defaults, persistence, selection, validation and unavailable-storage checks passed');
