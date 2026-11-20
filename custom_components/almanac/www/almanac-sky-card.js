@@ -47,6 +47,19 @@ function moonSvg(px, f, rot, detail) {
   return `<svg viewBox="-54 -54 108 108" width="${px}" height="${px}" aria-hidden="true"><defs><clipPath id="${id}"><path d="${lit}"/></clipPath></defs><circle r="50" fill="var(--moon-dark)"/><g transform="rotate(${rot.toFixed(1)})"><g clip-path="url(#${id})"><circle r="50" fill="var(--moon-lit)"/>${detail ? `<g transform="rotate(${(-rot).toFixed(1)})" fill="var(--moon-mare)">${MARIA}</g>` : ''}</g></g><circle r="50" fill="none" stroke="var(--moon-rim)" stroke-width="${detail ? 0.6 : 2}"/></svg>`;
 }
 
+const THEME_KEY = 'almanac.theme';
+const THEMES = [
+  ['original', 'Original', 'The sky changes with daylight, sunset and night', '#86b9ea', '#ffb454'],
+  ['steel', 'Brushed Steel', 'An industrial silver and charcoal console', '#292c30', '#ad9aff'],
+  ['relay', 'Amber Relay', 'Warm amber instruments and olive tones', '#24291f', '#ffbd5d'],
+  ['neon', 'Neon Grid', 'Cyan light and magenta accents', '#070d20', '#fd86e6'],
+  ['abyss', 'Midnight Drift', 'Deep blue with a soft lunar glow', '#0b1022', '#77f1ff'],
+  ['tide', 'Aqua Current', 'Teal glass and sea-green highlights', '#0b384b', '#7dffde'],
+  ['trek', 'Star Trek', 'Amber controls and lilac panel rails', '#080706', '#ffcc66'],
+  ['appearance', 'Follow Home Assistant', 'Use your Home Assistant colours and font', '#26382d', '#a6c48a'],
+];
+const validTheme = value => THEMES.some(([id]) => id === value);
+
 const CSS = `
 :host{display:block;color-scheme:dark;container-type:inline-size}
 *{box-sizing:border-box}
@@ -57,6 +70,34 @@ const CSS = `
 .shell[data-sky=twilight]{--bg1:#0a1030;--bg2:#2a2757;--bg3:#6b4468;--ink:#f3f0fa;--mute:#b6b1d3;--line:#ffffff26;--panel:#0a0c2455;--sun:#ffbd74;--moon:#e4e8f8;--moon-lit:#f5f1e6;--moon-dark:#232547;--moon-mare:#8d8a8055;--moon-rim:#ffffff35;--glow:#dfe4ff38;--stars:.45}
 .shell[data-sky=golden]{--bg1:#22346b;--bg2:#8b5273;--bg3:#e79158;--ink:#fff8f0;--mute:#f1dcd4;--line:#ffffff33;--panel:#160f2e66;--sun:#ffd08a;--moon:#f1f1fa;--moon-lit:#fffaf0;--moon-dark:#ffffff1c;--moon-mare:#a59a9044;--moon-rim:#ffffff55;--glow:#fff0d030;--stars:0}
 .shell[data-sky=day]{color-scheme:light;--bg1:#86b9ea;--bg2:#b9d7f3;--bg3:#e4eff9;--ink:#0b1b35;--mute:#3a5275;--line:#0b1b3526;--panel:#ffffff73;--sun:#c2570a;--moon:#4f6187;--moon-lit:#ffffff;--moon-dark:#3f578233;--moon-mare:#9fb3cf66;--moon-rim:#3f578280;--glow:#ffffff00;--stars:0}
+.shell:not([data-theme=original]){color-scheme:dark;--ink:#eef2fb;--mute:#b5bfd4;--line:#ffffff30;--panel:#ffffff0b;--sun:#ffbf69;--moon:#b7d7ff;--moon-lit:#fff7e8;--moon-dark:#172339;--moon-mare:#8d8a8055;--moon-rim:#ffffff40;--glow:#cfdcff30}
+.shell[data-theme=steel]{--bg1:#24272c;--bg2:#363b43;--bg3:#202329;--panel:linear-gradient(140deg,#ffffff12,#ffffff03);--moon:#c8b8ff;--serif:var(--sans)}
+.shell[data-theme=relay]{--bg1:#1b211b;--bg2:#33382b;--bg3:#191d17;--ink:#fff1c7;--mute:#d0c6a7;--sun:#ffbd5d;--moon:#b7d7b4;--serif:Georgia,serif}
+.shell[data-theme=neon]{--bg1:#04091b;--bg2:#111b3a;--bg3:#180e2a;--line:#28deef50;--sun:#fd86e6;--moon:#72f1ff;--panel:#061226aa;--serif:var(--sans)}
+.shell[data-theme=abyss]{--bg1:#080c1e;--bg2:#171f44;--bg3:#0b1530;--sun:#c6b4ff;--moon:#77f1ff;--panel:#737cef10}
+.shell[data-theme=tide]{--bg1:#082838;--bg2:#125063;--bg3:#082c3c;--sun:#ffe2a1;--moon:#7dffde;--mute:#b3d9df;--panel:#42bfc714}
+.shell[data-theme=trek]{--bg1:#080706;--bg2:#17120e;--bg3:#080706;--ink:#ffe3a2;--mute:#dfc591;--line:#b3a4ed66;--sun:#ffcc66;--moon:#b3a4ed;--panel:#231a12;--serif:var(--sans)}
+.shell[data-theme=trek] .p{border-inline-start:5px solid #b3a4ed;border-radius:24px 8px 8px 24px}
+.shell[data-theme=trek] h1{text-transform:uppercase;letter-spacing:.025em;font-size:clamp(27px,4vw,58px)}
+.shell[data-theme=neon] .p{box-shadow:inset 0 0 24px #28deef0a}
+.shell[data-theme=appearance]{color-scheme:normal;--bg1:var(--primary-background-color,#111827);--bg2:var(--secondary-background-color,#1f2937);--bg3:var(--primary-background-color,#111827);--ink:var(--primary-text-color,#f3f4f6);--mute:var(--secondary-text-color,#cbd5e1);--line:var(--divider-color,#ffffff30);--panel:var(--ha-card-background,var(--card-background-color,#1f2937));--sun:var(--accent-color,#ffbf69);--moon:var(--primary-color,#80c7ff);--sans:var(--primary-font-family,system-ui);--serif:var(--sans)}
+.header-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.settings-open,.settings-close,.theme-choice{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);cursor:pointer}
+.settings-open{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;padding:10px}
+.settings-open svg{width:22px;height:22px;fill:currentColor}
+button:focus-visible{outline:2px solid var(--moon);outline-offset:3px}
+.theme-dialog{width:min(600px,calc(100vw - 28px));max-height:calc(100dvh - 40px);overflow:auto;padding:22px;color:var(--ink);background:var(--bg1);border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 80px #0008}
+.theme-dialog::backdrop{background:#05091599}
+.settings-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.settings-heading h2{margin:0;font:600 22px var(--sans)}
+.settings-close{border-radius:8px;min-height:44px;padding:8px 12px}
+.settings-note{color:var(--mute);font-size:14px;line-height:1.5}
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
+.theme-choice{display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:12px;min-height:82px}
+.theme-choice[aria-pressed=true]{outline:2px solid var(--moon);outline-offset:-2px}
+.theme-choice strong{display:block;font-size:14px}.theme-choice small{display:block;color:var(--mute);font-size:12px;line-height:1.4;margin-top:4px}
+.theme-swatch{flex:0 0 32px;height:32px;border-radius:50%;border:1px solid #ffffff55}
+@container(max-width:480px){.header-actions{gap:4px}.top{flex-wrap:wrap}.theme-dialog{padding:16px}}
 .stars{position:absolute;inset:0;pointer-events:none;opacity:var(--stars);transition:opacity .6s}
 .stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff}
 main{position:relative;max-width:1680px;margin:auto}
@@ -120,7 +161,18 @@ h1{font-size:clamp(22px,2.3vw,34px);max-width:none;margin:8px 0 4px}
 `;
 
 class AlmanacSky extends HTMLElement {
-  constructor() { super(); this.attachShadow({ mode: 'open' }); this.cache = new Map(); this.midnights = new Map(); this.scrub = null; this.W = 0; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); this.cache = new Map(); this.midnights = new Map(); this.scrub = null; this.W = 0; this.theme = 'original'; try { const saved = localStorage.getItem(THEME_KEY); if (validTheme(saved)) this.theme = saved; } catch (_) {} }
+  chooseTheme(theme) {
+    if (!validTheme(theme)) return;
+    this.theme = theme;
+    try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
+    this.applyTheme();
+    this.draw();
+  }
+  applyTheme() {
+    this.shadowRoot.getElementById('shell').setAttribute('data-theme', this.theme);
+    for (const button of this.shadowRoot.querySelectorAll('[data-theme-choice]')) button.setAttribute('aria-pressed', String(button.dataset.themeChoice === this.theme));
+  }
   setConfig(c) { this.config = c || {}; }
   static getStubConfig() { return {}; }
   getCardSize() { return 14; }
@@ -166,17 +218,23 @@ class AlmanacSky extends HTMLElement {
     let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
     const stars = Array.from({ length: 70 }, () => `<i style="left:${(rnd() * 100).toFixed(1)}%;top:${(rnd() * 70).toFixed(1)}%;opacity:${(0.25 + rnd() * 0.7).toFixed(2)}${rnd() > 0.8 ? ';width:3px;height:3px' : ''}"></i>`).join('');
     const ns = this.lat >= 0 ? 'N' : 'S', ew = this.lon >= 0 ? 'E' : 'W';
-    this.shadowRoot.innerHTML = `<style>${CSS}</style><div class="shell" data-sky="night"><div class="stars">${stars}</div><main>
-<div class="top"><div class="brand"><img class="brand-logo" src="${LOGO}" alt="Almanac sun and moon logo" width="64" height="64"><span class="brand-location">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div><a id="home">← Home</a></div>
+    this.shadowRoot.innerHTML = `<style>${CSS}</style><div id="shell" class="shell" data-sky="night"><div class="stars">${stars}</div><main>
+<div class="top"><div class="brand"><img class="brand-logo" src="${LOGO}" alt="Almanac sun and moon logo" width="64" height="64"><span class="brand-location">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div><div class="header-actions"><a id="home">← Home</a><button id="settings" class="settings-open" type="button" aria-label="Almanac settings" aria-haspopup="dialog" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.9 7.9 0 0 0 0-2l2-1.5-2-3.5-2.3 1a8 8 0 0 0-1.7-1L15 3h-4l-.4 3a8 8 0 0 0-1.7 1L6.6 6l-2 3.5 2 1.5a7.9 7.9 0 0 0 0 2l-2 1.5 2 3.5 2.3-1a8 8 0 0 0 1.7 1l.4 3h4l.4-3a8 8 0 0 0 1.7-1l2.3 1 2-3.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg></button></div></div>
 <h1 id="head"></h1><p class="sub" id="sub"></p>
 <div class="bar"><div class="key"><span>Sun</span><span class="m">Moon</span></div><div class="live" id="live"></div></div>
 <div class="chart" id="chart" tabindex="0" role="slider" aria-label="Time of day. Drag or use arrow keys to preview the sky; Escape returns to now."><div id="plot"></div></div>
 <p class="hint">Drag across the day to see the sky at any hour.</p>
 <div class="grid"><section class="p" id="sun"></section><section class="p" id="moon"></section><section class="p" id="map"></section><section class="p" id="cycle"></section></div>
-</main></div>`;
+</main><dialog id="settings-dialog" class="theme-dialog" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">Almanac settings</h2><button id="settings-close" class="settings-close" type="button">Done</button></div><p class="settings-note">Choose a theme. Saved for Almanac in this browser. Original follows daylight, sunset and night.</p><div class="theme-grid">${THEMES.map(([id, name, description, background, accent]) => `<button type="button" class="theme-choice" data-theme-choice="${id}" aria-pressed="false"><span class="theme-swatch" aria-hidden="true" style="background:linear-gradient(135deg,${background} 55%,${accent} 56%)"></span><span><strong>${name}</strong><small>${description}</small></span></button>`).join('')}</div></dialog></div>`;
     const $ = id => this.shadowRoot.getElementById(id);
     $('home').setAttribute('href', this.config.home_path || '/lovelace/0');
     $('home').addEventListener('click', e => { e.preventDefault(); history.pushState(null, '', e.currentTarget.getAttribute('href')); window.dispatchEvent(new CustomEvent('location-changed')); });
+    const dialog = $('settings-dialog');
+    $('settings').addEventListener('click', () => { dialog.showModal(); dialog.querySelector('[aria-pressed="true"]')?.focus(); });
+    $('settings-close').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => $('settings').focus());
+    dialog.addEventListener('click', e => { const button = e.target.closest('[data-theme-choice]'); if (button) this.chooseTheme(button.dataset.themeChoice); });
+    this.applyTheme();
     const chart = $('chart');
     const seek = e => { const r = chart.getBoundingClientRect(), k = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); const start = this.dayStart(Date.now()), end = this.nextStart(start); this.scrub = Math.min(end, start + Math.round(k * (end - start) / 3e5) * 3e5); this.draw(); };
     chart.addEventListener('pointerdown', e => { chart.setPointerCapture(e.pointerId); this.drag = true; seek(e); });
