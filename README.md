@@ -136,6 +136,10 @@ Use the **Settings** gear beside Home on the Almanac card to choose a theme. The
 
 **Original** is the default and preserves the automatic daylight, sunset, twilight, and night colours. Other options are **Brushed Steel**, **Amber Relay**, **Neon Grid**, **Midnight Drift**, **Aqua Current**, **Star Trek**, and **Follow Appearance**. Follow Appearance uses the shared palette, font, and text size when the Appearance dashboard resource is loaded. Otherwise it uses your active Home Assistant colours and font. The theme only changes appearance; sensors and astronomical calculations stay the same.
 
+### Display units
+
+By default, Almanac uses Home Assistant’s temperature and distance units. **Settings → Units** lets you choose **Follow Home Assistant**, **Metric** (°C and km), or **US customary** (°F and mi). This preference is saved in the browser and applies to the card display.
+
 ## Stardate & astronomical events
 
 The header rotates through the next two major Moon phases, meteor shower peaks, and equinoxes or solstices. Use the arrows to browse or pause it. The stardate is Almanac’s display of the UTC year and its fractional progress.
@@ -202,7 +206,7 @@ Open the **Tonight’s Lineup** tab for local rise, transit (peak altitude), set
 
 Open **Sensor Telemetry** for current cloud cover, seeing, transparency, temperature and dew point. Almanac uses `weather.forecast_home` by default, or the sole weather entity if that ID is absent. Weather readings stay current while the sky timeline previews other times.
 
-Almanac shows a **Condensation warning** when the outdoor temperature is at or below 2°C above the dew point. Temperature sensors can report °C, °F or K. Cloud cover and transparency expect numeric percentages. Seeing accepts a numeric percentage or arcseconds. Missing readings appear as **Unavailable**.
+Almanac shows a **Condensation warning** when the outdoor temperature is at or below 2°C (3.6°F) above the dew point. The panel displays the threshold and temperature difference in the selected units. Temperature sensors can report °C, °F or K. Cloud cover and transparency expect numeric percentages. Seeing accepts a numeric percentage or arcseconds. Missing readings appear as **Unavailable**.
 
 To choose your own sources, add the optional `telemetry` mapping in your Almanac card YAML. Keep only the entries you want to override.
 
