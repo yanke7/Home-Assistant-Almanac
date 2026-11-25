@@ -11,7 +11,7 @@ A local sun and moon integration for Home Assistant, with continuously updated s
 
 ## Watch Almanac in 30 seconds
 
-[![A 30-second preview of Almanac’s sky dashboard, Home Assistant automations, themes and languages](assets/video/almanac-overview.gif)](https://github.com/yanke7/Home-Assistant-Almanac/releases/download/v2.10.1/almanac-overview-1080p.mp4)
+[![A 30-second preview of Almanac’s sky dashboard, Home Assistant automations, themes and languages](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/video/almanac-overview.gif)](https://github.com/yanke7/Home-Assistant-Almanac/releases/download/v2.10.1/almanac-overview-1080p.mp4)
 
 [Open the 1080p video with sound](https://github.com/yanke7/Home-Assistant-Almanac/releases/download/v2.10.1/almanac-overview-1080p.mp4)
 
@@ -33,7 +33,7 @@ Almanac uses the location and time zone already configured in Home Assistant. Su
 
 ## Theme gallery
 
-Choose a theme with the gear on the card. These Almanac v2.10.1 screenshots show the same sunset in Saskatoon so you can compare palettes. The preview uses local calculations. Select an image to see it full size.
+Choose a theme with the gear on the card. These screenshots show the same sunset in Saskatoon so you can compare palettes. The preview uses local calculations. Select an image to see it full size.
 
 ### Star Trek
 
@@ -58,6 +58,22 @@ Choose a theme with the gear on the card. These Almanac v2.10.1 screenshots show
 This preview shows the fallback colours. With the Appearance dashboard resource loaded, Almanac follows your shared palette, font and text size.
 
 [![Follow Appearance dashboard using fallback colours](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/appearance.jpg)](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/themes/appearance.jpg)
+
+## Observing tools
+
+These screenshots show the current dashboard tabs. Sensor Telemetry and Solar Weather use sample readings.
+
+### Tonight’s Lineup
+
+![Planet rise, transit, and set times, estimated brightness, and visibility](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/tonights-lineup.jpg)
+
+### Sensor Telemetry
+
+![Cloud cover, temperature, dew point, and a condensation warning](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/sensor-telemetry.jpg)
+
+### Subspace / Solar Weather
+
+![NOAA Kp, solar wind speed, southward Bz, and a possible aurora alert](https://raw.githubusercontent.com/yanke7/Home-Assistant-Almanac/main/assets/screenshots/solar-weather.jpg)
 
 ## Watch the sky change
 
