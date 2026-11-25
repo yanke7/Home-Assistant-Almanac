@@ -158,6 +158,11 @@ const LANGUAGES = { en: 'English', fr: 'Français', nl: 'Nederlands', de: 'Deuts
 const LANGUAGE_CODES = Object.keys(LANGUAGES);
 // Translations follow the language order in LANGUAGES, omitting English.
 const TRANSLATIONS = {
+  "Units": ["Unités", "Eenheden", "Einheiten", "Unidades", "Mga yunit", "Enheter", "Unità", "Jednostki", "Enheder", "Enheter"],
+  "Follow Home Assistant": ["Suivre Home Assistant", "Home Assistant volgen", "Home Assistant folgen", "Seguir Home Assistant", "Sundin ang Home Assistant", "Följ Home Assistant", "Segui Home Assistant", "Według Home Assistant", "Følg Home Assistant", "Følg Home Assistant"],
+  "Metric": ["Métrique", "Metrisch", "Metrisch", "Métrico", "Metriko", "Metriska", "Metrico", "Metryczne", "Metrisk", "Metrisk"],
+  "US customary": ["Unités américaines", "Amerikaanse eenheden", "US-Einheiten", "Unidades de EE. UU.", "Yunit ng US", "Amerikanska", "Unità statunitensi", "Jednostki amerykańskie", "Amerikanske enheder", "Amerikanske enheter"],
+  "Warning threshold": ["Seuil d’alerte", "Waarschuwingsdrempel", "Warnschwelle", "Umbral de aviso", "Hangganan ng babala", "Varningsgräns", "Soglia di avviso", "Próg ostrzeżenia", "Advarselsgrænse", "Varselgrense"],
   "Settings": ["Réglages", "Instellingen", "Einstellungen", "Ajustes", "Mga setting", "Inställningar", "Impostazioni", "Ustawienia", "Indstillinger", "Innstillinger"],
   "Original": ["Original", "Origineel", "Original", "Original", "Orihinal", "Original", "Originale", "Oryginalny", "Original", "Original"],
   "Brushed Steel": ["Acier brossé", "Geborsteld staal", "Gebürsteter Stahl", "Acero cepillado", "Brinas na bakal", "Borstat stål", "Acciaio spazzolato", "Stal szczotkowana", "Børstet stål", "Børstet stål"],
@@ -490,7 +495,7 @@ button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--in
 .event-controls{display:flex;flex-shrink:0;gap:3px}
 .event-controls button{min-width:27px;padding:3px 6px;line-height:1.2}
 .shell[data-theme=trek] .event-ticker{border-color:var(--gold)}
-#almanac-language{font:inherit;color:var(--ink);background:var(--bg1);padding:5px;border:1px solid var(--line);border-radius:6px}
+#almanac-language,#almanac-units{font:inherit;color:var(--ink);background:var(--bg1);padding:5px;border:1px solid var(--line);border-radius:6px}
 .view-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 8px}
 .view-tabs button[aria-selected=true]{border-color:var(--sun);color:var(--sun)}
 .planet-setting{display:flex;gap:8px;align-items:center;margin:14px 0 0;font-size:14px}
@@ -691,14 +696,45 @@ class AlmanacSky extends HTMLElement {
     if (shell) window.YankeAppearance?.apply?.(shell, this._hass);
   }
 
+  get displayUnits() {
+    if (this.unitsOverride === 'imperial') return { temperature: '°F', length: 'mi' };
+    if (this.unitsOverride === 'metric') return { temperature: '°C', length: 'km' };
+    const home = this._hass?.config?.unit_system;
+    return {
+      temperature: ['°C', '°F', 'K'].includes(home?.temperature) ? home.temperature : '°C',
+      length: home?.length === 'mi' ? 'mi' : 'km',
+    };
+  }
+
+  formatTemperature(celsius, difference = false) {
+    if (celsius == null) return this.tr('Unavailable');
+    const {temperature} = this.displayUnits;
+    let value = celsius;
+    if (temperature === '°F') value = celsius * 9 / 5 + (difference ? 0 : 32);
+    if (temperature === 'K' && !difference) value = celsius + 273.15;
+    return `${new Intl.NumberFormat(this.language, { maximumFractionDigits: 1 }).format(value)} ${temperature}`;
+  }
+
+  formatDistance(kilometres) {
+    const {length} = this.displayUnits;
+    const value = length === 'mi' ? kilometres / 1.609344 : kilometres;
+    return `${(Math.round(value / 100) * 100).toLocaleString(this.language)} ${length}`;
+  }
+
   setConfig(c) { this.config = c || {}; }
   static getStubConfig() { return {}; }
   getCardSize() { return 14; }
   set hass(h) {
     const key = [h.config.latitude, h.config.longitude, h.config.time_zone, h.locale?.language, h.locale?.time_format].join();
+    const previousUnits = this.displayUnits;
     this._hass = h;
-    if (this.activeView === 2 && this.isConnected) this.renderTelemetry();
+    const units = this.displayUnits;
+    const unitsChanged = previousUnits.temperature !== units.temperature || previousUnits.length !== units.length;
     if (key !== this.key) { this.key = key; this.backend = null; this.chartKey = null; this.lastFetch = 0; this.cache.clear(); this.midnights.clear(); this.scrub = null; this.cycleKey = null; this.init(); }
+    if (this.isConnected) {
+      if (unitsChanged) this.draw();
+      else if (this.activeView === 2) this.renderTelemetry();
+    }
     this.syncAppearance();
     this.syncBackend();
   }
@@ -796,7 +832,7 @@ class AlmanacSky extends HTMLElement {
 <div class="twilight-key"><span>${this.tr('Civil twilight')}</span><span>${this.tr('Nautical twilight')}</span><span>${this.tr('Astronomical twilight')}</span><span>${this.tr('Night')}</span><span>${this.tr('Moonless dark sky')}</span></div><p class="hint">${this.tr('Drag across the day to see the sky at any hour.')}</p></section>
 <div class="grid"><section class="p" id="sun"></section><section class="p" id="moon"></section><section class="p" id="map">${this.heading('Where to look', 'ORBITAL / LOOK', 158)}<div id="map-readout"></div></section><section class="p" id="cycle"></section><span class="rail-footer">Almanac · ${Math.abs(this.lat).toFixed(2)}° ${ns} · ${Math.abs(this.lon).toFixed(2)}° ${ew}</span></div>
 </div><section class="p" id="lineup-view" role="tabpanel" aria-labelledby="lineup-tab" hidden></section><section class="p" id="telemetry-view" role="tabpanel" aria-labelledby="telemetry-tab" hidden></section><section class="p" id="space-view" role="tabpanel" aria-labelledby="space-tab" hidden></section>
-</main><dialog id="settings-dialog" class="theme-dialog" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">${this.tr('Almanac settings')}</h2><button id="settings-close" class="settings-close" type="button">${this.tr('Done')}</button></div><label class="planet-setting">${this.tr('Language')} <select id="almanac-language">${LANGUAGE_CODES.map(code => `<option value="${code}">${LANGUAGES[code]}</option>`).join('')}</select></label><p class="settings-note">${this.tr('Choose a theme')}</p><div class="theme-grid">${THEMES.map(([id, name, description, background, accent]) => `<button type="button" class="theme-choice" data-theme-choice="${id}" aria-pressed="false"><span class="theme-swatch" aria-hidden="true" style="background:linear-gradient(135deg,${background} 55%,${accent} 56%)"></span><span><strong>${this.tr(name)}</strong><small>${this.tr(description)}</small></span></button>`).join('')}</div><label class="planet-setting"><input type="checkbox" id="planet-toggle"> Show planets on the sky map</label></dialog></div>`;
+</main><dialog id="settings-dialog" class="theme-dialog" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">${this.tr('Almanac settings')}</h2><button id="settings-close" class="settings-close" type="button">${this.tr('Done')}</button></div><label class="planet-setting">${this.tr('Language')} <select id="almanac-language">${LANGUAGE_CODES.map(code => `<option value="${code}">${LANGUAGES[code]}</option>`).join('')}</select></label><label class="planet-setting">${this.tr('Units')} <select id="almanac-units"><option value="auto">${this.tr('Follow Home Assistant')}</option><option value="metric">${this.tr('Metric')}</option><option value="imperial">${this.tr('US customary')}</option></select></label><p class="settings-note">${this.tr('Choose a theme')}</p><div class="theme-grid">${THEMES.map(([id, name, description, background, accent]) => `<button type="button" class="theme-choice" data-theme-choice="${id}" aria-pressed="false"><span class="theme-swatch" aria-hidden="true" style="background:linear-gradient(135deg,${background} 55%,${accent} 56%)"></span><span><strong>${this.tr(name)}</strong><small>${this.tr(description)}</small></span></button>`).join('')}</div><label class="planet-setting"><input type="checkbox" id="planet-toggle"> Show planets on the sky map</label></dialog></div>`;
     const $ = id => this.shadowRoot.getElementById(id);
     $('home').setAttribute('href', this.config.home_path || '/lovelace/0');
     $('home').addEventListener('click', e => { e.preventDefault(); history.pushState(null, '', e.currentTarget.getAttribute('href')); window.dispatchEvent(new CustomEvent('location-changed')); });
@@ -806,6 +842,16 @@ class AlmanacSky extends HTMLElement {
     dialog.addEventListener('close', () => $('settings').focus());
     dialog.addEventListener('click', e => { const button = e.target.closest('[data-theme-choice]'); if (button) this.chooseTheme(button.dataset.themeChoice); });
     this.applyTheme();
+    const unitsSelect = $('almanac-units');
+    let savedUnits;
+    try { savedUnits = localStorage.getItem('almanac.units'); } catch (_) {}
+    this.unitsOverride ??= ['metric', 'imperial'].includes(savedUnits) ? savedUnits : 'auto';
+    unitsSelect.value = this.unitsOverride;
+    unitsSelect.addEventListener('change', () => {
+      this.unitsOverride = unitsSelect.value;
+      try { localStorage.setItem('almanac.units', this.unitsOverride); } catch (_) {}
+      this.draw();
+    });
     const languageSelect = $('almanac-language');
     languageSelect.value = this.language;
     languageSelect.addEventListener('change', () => {
@@ -987,7 +1033,7 @@ class AlmanacSky extends HTMLElement {
     // moon
     const rot = -((il.ang - m.pa) / R) - 90;
     $('moon').innerHTML = `${this.heading('Moon', 'LUNAR TELEMETRY', 179, pct + '%')}<div class="moonrow">${moonSvg(118, il.f, rot, true)}<div><div class="name">${this.tr(name)}</div><p class="cap">${pct}% ${this.tr('lit')} · ${this.tr(il.phase < 0.5 ? 'waxing' : 'waning')}</p></div></div>
-<dl class="stats">${st('Altitude', deg(m.alt), this.tr(moonUp ? 'up' : 'down'))}${st('Direction', `${P16[Math.round(m.az / 22.5) % 16]} ${Math.round(m.az)}°`)}${moonUp && mRose ? st('Rose', this.tm(mRose), mRose < d0 ? this.tr('yesterday') : '') : st('Rises', this.tm(mRise), mRise ? this.dayTag(mRise, d0) : '')}${st('Sets', this.tm(mSet), mSet ? this.dayTag(mSet, d0) : '')}${st('Age', this.ageFormat.format(il.phase * 29.53))}${st('Distance', `${Math.round(m.dist / 100) * 100 >= 1e3 ? (Math.round(m.dist / 100) * 100).toLocaleString(this.language) : m.dist} km`)}</dl>`;
+<dl class="stats">${st('Altitude', deg(m.alt), this.tr(moonUp ? 'up' : 'down'))}${st('Direction', `${P16[Math.round(m.az / 22.5) % 16]} ${Math.round(m.az)}°`)}${moonUp && mRose ? st('Rose', this.tm(mRose), mRose < d0 ? this.tr('yesterday') : '') : st('Rises', this.tm(mRise), mRise ? this.dayTag(mRise, d0) : '')}${st('Sets', this.tm(mSet), mSet ? this.dayTag(mSet, d0) : '')}${st('Age', this.ageFormat.format(il.phase * 29.53))}${st('Distance', this.formatDistance(m.dist))}</dl>`;
 
     // sky map
     const pt = (alt, az, r = 100) => { const q = (90 - Math.max(0, alt)) / 90 * r; return [q * Math.sin(az * R), -q * Math.cos(az * R)]; };
@@ -1112,7 +1158,6 @@ ${observation('Local aurora index', aurora && {value: aurora.local_index, time: 
     const dew = temperature(config.dew_point_entity, 'dew_point');
     const spread = temp == null || dew == null ? null : temp - dew;
     const warning = spread != null && spread <= 2 + 1e-8;
-    const formatTemp = value => value == null ? this.tr('Unavailable') : `${value.toFixed(1)} °C`;
     const percentageTile = (label, value) => `<div><dt>${this.tr(label)}</dt><dd>${value == null ? this.tr('Unavailable') :
       `${Math.round(value)}%<meter aria-label="${this.tr(label)}" min="0" max="100" value="${value}"></meter>`}</dd></div>`;
     const seeing = states[config.seeing_entity];
@@ -1126,9 +1171,10 @@ ${observation('Local aurora index', aurora && {value: aurora.local_index, time: 
 ${percentageTile('Cloud cover', percentage(config.cloud_cover_entity ? states[config.cloud_cover_entity]?.state : attrs.cloud_coverage))}
 ${seeingTile}
 ${percentageTile('Transparency', percentage(states[config.transparency_entity]?.state))}
-<div><dt>${this.tr('Temperature')}</dt><dd>${formatTemp(temp)}</dd></div>
-<div><dt>${this.tr('Dew point')}</dt><dd>${formatTemp(dew)}</dd></div>
-<div><dt>${this.tr('Temperature above dew point')}</dt><dd>${formatTemp(spread)}</dd></div>
+<div><dt>${this.tr('Temperature')}</dt><dd>${this.formatTemperature(temp)}</dd></div>
+<div><dt>${this.tr('Dew point')}</dt><dd>${this.formatTemperature(dew)}</dd></div>
+<div><dt>${this.tr('Temperature above dew point')}</dt><dd>${this.formatTemperature(spread, true)}</dd></div>
+<div><dt>${this.tr('Warning threshold')}</dt><dd>${this.formatTemperature(2, true)}</dd></div>
 </dl>
 <p class="dew-status${warning ? ' warning' : ''}">${this.tr(spread == null ? 'Dew risk unavailable' : warning ? 'Condensation warning' : 'Low dew risk')}</p>`;
     if (panel.innerHTML !== html) panel.innerHTML = html;
